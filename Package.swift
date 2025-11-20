@@ -7,9 +7,7 @@ let package = Package(
     name: "integration-swift-braze",
     platforms: [
         .iOS(.v15),
-        .macOS(.v12),
-        .tvOS(.v15),
-        .watchOS(.v8)
+        .tvOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
