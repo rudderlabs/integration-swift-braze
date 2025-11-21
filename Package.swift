@@ -14,7 +14,7 @@ let package = Package(
         .library(
             name: "RudderIntegrationBraze",
             targets: ["RudderIntegrationBraze"]
-        ),
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static", .upToNextMajor(from: "12.0.0")),
@@ -34,6 +34,6 @@ let package = Package(
         .testTarget(
             name: "RudderIntegrationBrazeTests",
             dependencies: ["RudderIntegrationBraze"]
-        ),
+        )
     ]
 )

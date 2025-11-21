@@ -13,38 +13,44 @@ import RudderStackAnalytics
  * Braze Integration for RudderStack Swift SDK
  */
 public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
-    
+
     // MARK: - Required Protocol Properties
-    
+
     /**
      Plugin type for Braze integration - always terminal
      */
     public var pluginType: PluginType = .terminal
-    
+
     /**
      Reference to the analytics instance
      */
     public var analytics: Analytics?
-    
+
     /**
      Integration key identifier
      */
     public var key: String = "Braze"
-    
+
     // MARK: - Private Properties
-    
-    private var brazeInstance: Braze?
+
+    private let brazeAdapter: BrazeAdapter
     private var supportDedup: Bool = false
     private var previousIdentifyPayload: IdentifyEvent?
     private var prevExternalId: String?
     private var connectionMode: ConnectionMode = .cloud
-    
+
     // MARK: - Initialization
-    
-    public init() {}
-    
+
+    init(brazeAdapter: BrazeAdapter) {
+        self.brazeAdapter = brazeAdapter
+    }
+
+    public convenience init() {
+        self.init(brazeAdapter: DefaultBrazeAdapter())
+    }
+
     // MARK: - Required Protocol Methods
-    
+
     /**
      * Creates and initializes the Braze integration
      * Maps from Objective-C: initWithConfig:withAnalytics:rudderConfig:
@@ -55,43 +61,46 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
             LoggerAnalytics.error("API Token is invalid. Aborting Braze SDK initialization.")
             throw BrazeIntegrationError.invalidAPIToken
         }
-        
+
         // Set deduplication support
         supportDedup = destinationConfig["supportDedup"] as? Bool ?? false
-        
+
         // Determine connection mode
         connectionMode = getConnectionMode(config: destinationConfig)
-        
+
         // Configure Braze endpoint based on data center
         let endpoint = try getBrazeEndpoint(from: destinationConfig)
-        
+
         // Create Braze configuration with endpoint
         let configuration = Braze.Configuration(apiKey: apiToken, endpoint: endpoint)
-        
+
         // Set log level based on RudderStack log level - will be set after Braze instance creation
-        
-        // Initialize Braze instance
-        brazeInstance = Braze(configuration: configuration)
-        
+
+        // Initialize Braze instance using adapter
+        guard brazeAdapter.initialize(configuration: configuration) else {
+            LoggerAnalytics.error("Failed to initialize Braze SDK")
+            throw BrazeIntegrationError.initializationFailed
+        }
+
         // Set log level based on RudderStack log level
         mapRudderLogLevelToBraze(LoggerAnalytics.logLevel)
-        
+
         // Set user alias using anonymous ID if available
         if let analytics = analytics, let anonymousId = analytics.anonymousId {
             setUserAlias(anonymousId)
         }
-        
+
         LoggerAnalytics.debug("Braze SDK initialized successfully")
     }
-    
+
     /**
-     * Returns the Braze instance
+     * Returns the destination instance
      * Required by IntegrationPlugin protocol
      */
     public func getDestinationInstance() -> Any? {
-        return brazeInstance
+        return brazeAdapter.getDestinationInstance()
     }
-    
+
     /**
      * Updates destination configuration dynamically (Swift-specific feature)
      */
@@ -100,12 +109,12 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         // Update configuration properties that can be changed at runtime
         supportDedup = destinationConfig["supportDedup"] as? Bool ?? false
         connectionMode = getConnectionMode(config: destinationConfig)
-        
+
         LoggerAnalytics.debug("Braze configuration updated")
     }
-    
+
     // MARK: - Event Methods (extracted from Objective-C dump method)
-    
+
     /**
      * Handles identify events
      * Extracted from Objective-C dump method - identify event handling
@@ -113,11 +122,11 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
     public func identify(payload: IdentifyEvent) {
         // Only process events in device mode
         guard connectionMode == .device else { return }
-        
+
         // Process identify event directly (thread safety handled by Braze SDK)
         processIdentifyEvent(payload: payload)
     }
-    
+
     /**
      * Handles track events
      * Extracted from Objective-C dump method - track event handling
@@ -125,29 +134,29 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
     public func track(payload: TrackEvent) {
         // Only process events in device mode
         guard connectionMode == .device else { return }
-        
+
         let eventName = payload.event
         let properties = payload.properties?.dictionary?.rawDictionary ?? [:]
-        
+
         if eventName == "Install Attributed" {
             handleInstallAttributedEvent(properties: properties)
         } else if eventName == "Order Completed" {
             handleOrderCompletedEvent(properties: properties)
         } else {
             // Regular custom event
-            brazeInstance?.logCustomEvent(name: eventName, properties: properties)
+            brazeAdapter.logCustomEvent(name: eventName, properties: properties)
             LoggerAnalytics.debug("Braze logCustomEvent: \(eventName) withProperties: \(properties)")
         }
     }
-    
+
     // MARK: - Lifecycle Methods
-    
+
     /**
      * Flushes pending events
      * Maps from Objective-C flush method
      */
     public func flush() {
-        brazeInstance?.requestImmediateDataFlush()
+        brazeAdapter.requestImmediateDataFlush()
         LoggerAnalytics.debug("Braze requestImmediateDataFlush")
     }
 }
@@ -155,15 +164,15 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
 // MARK: - Private Helper Methods
 
 private extension BrazeIntegration {
-    
+
     /**
      * Sets user alias using anonymous ID
      */
     func setUserAlias(_ anonymousId: String) {
-        _ = brazeInstance?.user.add(alias: anonymousId, label: "rudder_id")
+        _ = brazeAdapter.addUserAlias(anonymousId, label: "rudder_id")
         LoggerAnalytics.debug("Braze user alias set with anonymous ID")
     }
-    
+
     /**
      * Gets external ID from message context
      */
@@ -171,7 +180,7 @@ private extension BrazeIntegration {
         guard let externalIds = payload.context?["externalIds"] as? [[String: Any]] else {
             return nil
         }
-        
+
         for externalIdDict in externalIds {
             if let type = externalIdDict["type"] as? String,
                type == "brazeExternalId",
@@ -181,95 +190,93 @@ private extension BrazeIntegration {
         }
         return nil
     }
-    
+
     /**
      * Processes identify event with user profile updates
      */
     func processIdentifyEvent(payload: IdentifyEvent) {
-        guard let brazeInstance = brazeInstance else { return }
-        
         // Handle external ID or user ID for changeUser
         let currExternalId = getExternalId(from: payload)
         let currUserId = payload.userId
-        
+
         if let externalId = currExternalId {
             if prevExternalId == nil || externalId != prevExternalId {
-                brazeInstance.changeUser(userId: externalId)
+                brazeAdapter.changeUser(userId: externalId)
                 LoggerAnalytics.debug("Identify: Braze changeUser with externalId")
             }
         } else if let userId = currUserId {
             let prevUserId = previousIdentifyPayload?.userId
             if prevUserId == nil || userId != prevUserId {
-                brazeInstance.changeUser(userId: userId)
+                brazeAdapter.changeUser(userId: userId)
                 LoggerAnalytics.debug("Identify: Braze changeUser with userId")
             }
         }
-        
+
         // Store current external ID for comparison
         prevExternalId = currExternalId
-        
+
         // Process user traits
         if let traits = payload.context?["traits"] as? [String: Any] {
-            processTraits(traits: traits, brazeUser: brazeInstance.user)
+            processTraits(traits: traits)
         }
-        
+
         // Store current payload for deduplication
         previousIdentifyPayload = payload
     }
-    
+
     /**
      * Processes user traits and maps them to Braze user properties
      */
-    func processTraits(traits: [String: Any], brazeUser: BrazeKit.Braze.User) {
+    func processTraits(traits: [String: Any]) {
         for (key, value) in traits {
             let updatedValue = needUpdate(key: key, currentValue: value)
             guard let validValue = updatedValue else { continue }
-            
+
             switch key {
             case "lastname":
                 if let lastName = validValue as? String {
-                    brazeUser.set(lastName: lastName)
+                    brazeAdapter.setUserAttribute(.lastName(lastName))
                     LoggerAnalytics.debug("Identify: Braze user lastname")
                 }
             case "email":
                 if let email = validValue as? String {
-                    brazeUser.set(email: email)
+                    brazeAdapter.setUserAttribute(.email(email))
                     LoggerAnalytics.debug("Identify: Braze email")
                 }
             case "firstname":
                 if let firstName = validValue as? String {
-                    brazeUser.set(firstName: firstName)
+                    brazeAdapter.setUserAttribute(.firstName(firstName))
                     LoggerAnalytics.debug("Identify: Braze firstname")
                 }
             case "birthday":
                 if let birthday = validValue as? Date {
-                    brazeUser.set(dateOfBirth: birthday)
+                    brazeAdapter.setUserAttribute(.dateOfBirth(birthday))
                     LoggerAnalytics.debug("Identify: Braze date of birth")
                 }
             case "gender":
                 if let gender = validValue as? String {
                     let lowercaseGender = gender.lowercased()
                     if lowercaseGender == "m" || lowercaseGender == "male" {
-                        brazeUser.set(gender: .male)
+                        brazeAdapter.setUserAttribute(.gender(Braze.User.Gender.male))
                         LoggerAnalytics.debug("Identify: Braze gender")
                     } else if lowercaseGender == "f" || lowercaseGender == "female" {
-                        brazeUser.set(gender: .female)
+                        brazeAdapter.setUserAttribute(.gender(Braze.User.Gender.female))
                         LoggerAnalytics.debug("Identify: Braze gender")
                     }
                 }
             case "phone":
                 if let phone = validValue as? String {
-                    brazeUser.set(phoneNumber: phone)
+                    brazeAdapter.setUserAttribute(.phoneNumber(phone))
                     LoggerAnalytics.debug("Identify: Braze phone")
                 }
             case "address":
                 if let address = validValue as? [String: Any] {
                     if let city = address["city"] as? String {
-                        brazeUser.set(homeCity: city)
+                        brazeAdapter.setUserAttribute(.homeCity(city))
                         LoggerAnalytics.debug("Identify: Braze homecity")
                     }
                     if let country = address["country"] as? String {
-                        brazeUser.set(country: country)
+                        brazeAdapter.setUserAttribute(.country(country))
                         LoggerAnalytics.debug("Identify: Braze country")
                     }
                 }
@@ -277,37 +284,37 @@ private extension BrazeIntegration {
                 // Handle custom attributes (ignore standard traits)
                 let standardTraits = ["birthday", "anonymousId", "gender", "phone", "address", "firstname", "lastname", "email"]
                 if !standardTraits.contains(key) {
-                    setCustomAttribute(key: key, value: validValue, brazeUser: brazeUser)
+                    setCustomAttribute(key: key, value: validValue)
                 }
             }
         }
     }
-    
+
     /**
      * Sets custom attribute based on value type
      */
-    func setCustomAttribute(key: String, value: Any, brazeUser: BrazeKit.Braze.User) {
+    func setCustomAttribute(key: String, value: Any) {
         switch value {
         case let stringValue as String:
-            brazeUser.setCustomAttribute(key: key, value: stringValue)
+            brazeAdapter.setCustomAttribute(key: key, value: stringValue)
             LoggerAnalytics.debug("Braze setCustomAttribute: \(key) stringValue")
         case let dateValue as Date:
-            brazeUser.setCustomAttribute(key: key, value: dateValue)
+            brazeAdapter.setCustomAttribute(key: key, value: dateValue)
             LoggerAnalytics.debug("Braze setCustomAttribute: \(key) dateValue")
         case let boolValue as Bool:
-            brazeUser.setCustomAttribute(key: key, value: boolValue)
+            brazeAdapter.setCustomAttribute(key: key, value: boolValue)
             LoggerAnalytics.debug("Braze setCustomAttribute: \(key) boolValue")
         case let intValue as Int:
-            brazeUser.setCustomAttribute(key: key, value: intValue)
+            brazeAdapter.setCustomAttribute(key: key, value: intValue)
             LoggerAnalytics.debug("Braze setCustomAttribute: \(key) intValue")
         case let doubleValue as Double:
-            brazeUser.setCustomAttribute(key: key, value: doubleValue)
+            brazeAdapter.setCustomAttribute(key: key, value: doubleValue)
             LoggerAnalytics.debug("Braze setCustomAttribute: \(key) doubleValue")
         case let arrayValue as [Any]:
             // Braze doesn't support array custom attributes, convert to JSON string
             if let jsonData = try? JSONSerialization.data(withJSONObject: arrayValue),
                let jsonString = String(data: jsonData, encoding: .utf8) {
-                brazeUser.setCustomAttribute(key: key, value: jsonString)
+                brazeAdapter.setCustomAttribute(key: key, value: jsonString)
                 LoggerAnalytics.debug("Braze setCustomAttribute: \(key) arrayValue (as JSON string)")
             } else {
                 LoggerAnalytics.debug("Failed to convert array to JSON for key: \(key)")
@@ -316,7 +323,7 @@ private extension BrazeIntegration {
             LoggerAnalytics.debug("Unsupported custom attribute type for key: \(key)")
         }
     }
-    
+
     /**
      * Handles Install Attributed event with attribution data
      */
@@ -328,15 +335,15 @@ private extension BrazeIntegration {
                 adGroup: campaign["ad_group"] as? String,
                 creative: campaign["ad_creative"] as? String
             )
-            brazeInstance?.user.set(attributionData: attributionData)
+            brazeAdapter.setUserAttribute(.attributionData(attributionData))
             LoggerAnalytics.debug("Braze setAttributionData")
         } else {
             // Fallback to regular custom event
-            brazeInstance?.logCustomEvent(name: "Install Attributed", properties: properties)
+            brazeAdapter.logCustomEvent(name: "Install Attributed", properties: properties)
             LoggerAnalytics.debug("Braze logCustomEvent: Install Attributed withProperties")
         }
     }
-    
+
     /**
      * Handles Order Completed event with purchase tracking
      */
@@ -344,10 +351,10 @@ private extension BrazeIntegration {
         guard let purchaseList = getPurchaseList(from: properties), !purchaseList.isEmpty else {
             return
         }
-        
+
         for purchase in purchaseList {
             guard let price = purchase.price else { continue }
-            brazeInstance?.logPurchase(
+            brazeAdapter.logPurchase(
                 productId: purchase.productId,
                 currency: purchase.currency,
                 price: NSDecimalNumber(decimal: price).doubleValue,
@@ -357,7 +364,7 @@ private extension BrazeIntegration {
             LoggerAnalytics.debug("Braze logPurchase: \(purchase.productId) currency: \(purchase.currency) price: \(price) quantity: \(purchase.quantity)")
         }
     }
-    
+
     /**
      * Extracts purchase list from Order Completed properties
      */
@@ -365,9 +372,9 @@ private extension BrazeIntegration {
         guard let productList = properties["products"] as? [[String: Any]], !productList.isEmpty else {
             return nil
         }
-        
+
         let currency = (properties["currency"] as? String)?.count == 3 ? properties["currency"] as! String : "USD"
-        
+
         let ignoredKeys = ["product_id", "quantity", "price", "products", "time", "event_name", "currency"]
         var otherProperties: [String: Any] = [:]
         for (key, value) in properties {
@@ -375,12 +382,12 @@ private extension BrazeIntegration {
                 otherProperties[key] = value
             }
         }
-        
+
         var purchaseList: [BrazePurchase] = []
         for product in productList {
             var purchase = BrazePurchase()
             var productProperties = otherProperties
-            
+
             for (key, value) in product {
                 switch key {
                 case "product_id":
@@ -397,25 +404,25 @@ private extension BrazeIntegration {
                     productProperties[key] = value
                 }
             }
-            
+
             purchase.currency = currency
             purchase.properties = productProperties
-            
+
             // Only add if we have required fields
             if !purchase.productId.isEmpty && purchase.price != nil {
                 purchaseList.append(purchase)
             }
         }
-        
+
         return purchaseList.isEmpty ? nil : purchaseList
     }
-    
+
     /**
      * Converts revenue value to Decimal
      */
     func revenueDecimal(from value: Any?) -> Decimal? {
         guard let value = value else { return nil }
-        
+
         if let stringValue = value as? String {
             return Decimal(string: stringValue)
         } else if let decimalValue = value as? Decimal {
@@ -425,7 +432,7 @@ private extension BrazeIntegration {
         }
         return nil
     }
-    
+
     /**
      * Determines if a trait value needs updating (for deduplication)
      */
@@ -435,31 +442,31 @@ private extension BrazeIntegration {
               let prevValue = prevTraits[key] else {
             return currentValue
         }
-        
+
         // Special handling for address comparison
         if key == "address",
            let currAddress = currentValue as? [String: Any],
            let prevAddress = prevValue as? [String: Any] {
             return compareAddress(current: currAddress, previous: prevAddress) ? nil : currentValue
         }
-        
+
         // Special handling for date comparison
         if key == "birthday",
            let currDate = currentValue as? Date,
            let prevDate = prevValue as? Date {
             return currDate == prevDate ? nil : currentValue
         }
-        
+
         // General equality check
         if let currValue = currentValue as? NSObject,
            let prevValueObj = prevValue as? NSObject,
            currValue.isEqual(prevValueObj) {
             return nil
         }
-        
+
         return currentValue
     }
-    
+
     /**
      * Compares address objects for equality
      */
@@ -468,10 +475,10 @@ private extension BrazeIntegration {
         let prevCity = previous["city"] as? String
         let currCountry = current["country"] as? String
         let prevCountry = previous["country"] as? String
-        
+
         return currCity == prevCity && currCountry == prevCountry
     }
-    
+
     /**
      * Determines connection mode from configuration
      */
@@ -479,7 +486,7 @@ private extension BrazeIntegration {
         guard let connectionModeString = config["connectionMode"] as? String else {
             return .cloud
         }
-        
+
         switch connectionModeString.lowercased() {
         case "hybrid":
             return .hybrid
@@ -489,27 +496,29 @@ private extension BrazeIntegration {
             return .cloud
         }
     }
-    
+
     /**
      * Maps RudderStack log level to Braze log level
      */
     func mapRudderLogLevelToBraze(_ rudderLogLevel: LogLevel) {
+        let brazeLogLevel: Braze.Configuration.Logger.Level
         switch rudderLogLevel {
         case .none:
-            brazeInstance?.configuration.logger.level = .disabled
+            brazeLogLevel = .disabled
         case .error:
-            brazeInstance?.configuration.logger.level = .error
+            brazeLogLevel = .error
         case .warn:
-            brazeInstance?.configuration.logger.level = .error  // Braze doesn't have warn, use error
+            brazeLogLevel = .error  // Braze doesn't have warn, use error
         case .info:
-            brazeInstance?.configuration.logger.level = .info
+            brazeLogLevel = .info
         case .debug:
-            brazeInstance?.configuration.logger.level = .debug
+            brazeLogLevel = .debug
         case .verbose:
-            brazeInstance?.configuration.logger.level = .debug  // Braze doesn't have verbose, use debug
+            brazeLogLevel = .debug  // Braze doesn't have verbose, use debug
         }
+        brazeAdapter.setLogLevel(brazeLogLevel)
     }
-    
+
     /**
      * Gets Braze endpoint based on data center configuration
      */
@@ -518,9 +527,9 @@ private extension BrazeIntegration {
               !dataCenter.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw BrazeIntegrationError.invalidDataCenter
         }
-        
+
         let trimmedDataCenter = dataCenter.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         switch trimmedDataCenter {
         case "US-01": return "sdk.iad-01.braze.com"
         case "US-02": return "sdk.iad-02.braze.com"
@@ -566,13 +575,16 @@ private struct BrazePurchase {
 public enum BrazeIntegrationError: Error {
     case invalidAPIToken
     case invalidDataCenter
-    
+    case initializationFailed
+
     var localizedDescription: String {
         switch self {
         case .invalidAPIToken:
             return "API Token is invalid or missing"
         case .invalidDataCenter:
             return "Invalid data center configuration"
+        case .initializationFailed:
+            return "Failed to initialize Braze SDK"
         }
     }
 }
