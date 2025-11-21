@@ -53,7 +53,6 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
 
     /**
      * Creates and initializes the Braze integration
-     * Maps from Objective-C: initWithConfig:withAnalytics:rudderConfig:
      */
     public func create(destinationConfig: [String: Any]) throws {
         // Extract configuration values
@@ -113,11 +112,11 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         LoggerAnalytics.debug("Braze configuration updated")
     }
 
-    // MARK: - Event Methods (extracted from Objective-C dump method)
+    // MARK: - Event Methods
 
     /**
      * Handles identify events
-     * Extracted from Objective-C dump method - identify event handling
+     * Handle identify events and update user attributes
      */
     public func identify(payload: IdentifyEvent) {
         // Only process events in device mode
@@ -129,7 +128,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
 
     /**
      * Handles track events
-     * Extracted from Objective-C dump method - track event handling
+     * Handle track events and log them to Braze
      */
     public func track(payload: TrackEvent) {
         // Only process events in device mode
@@ -153,7 +152,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
 
     /**
      * Flushes pending events
-     * Maps from Objective-C flush method
+     * Request immediate data flush to Braze
      */
     public func flush() {
         brazeAdapter.requestImmediateDataFlush()
@@ -550,7 +549,7 @@ private extension BrazeIntegration {
 // MARK: - Supporting Types
 
 /**
- Connection mode enum matching Objective-C implementation
+ Connection mode enum for integration configuration
  */
 private enum ConnectionMode {
     case hybrid
@@ -559,7 +558,7 @@ private enum ConnectionMode {
 }
 
 /**
- Purchase model matching Objective-C BrazePurchase
+ Purchase model for Braze purchase events
  */
 private struct BrazePurchase {
     var productId: String = ""
