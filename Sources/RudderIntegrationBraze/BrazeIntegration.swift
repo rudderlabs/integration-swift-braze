@@ -176,7 +176,8 @@ private extension BrazeIntegration {
      * Gets external ID from message context
      */
     func getExternalId(from payload: IdentifyEvent) -> String? {
-        guard let externalIds = payload.context?["externalIds"] as? [[String: Any]] else {
+        guard let externalIdsAnyCodable = payload.context?["externalIds"],
+              let externalIds = externalIdsAnyCodable.value as? [[String: Any]] else {
             return nil
         }
 
@@ -214,8 +215,9 @@ private extension BrazeIntegration {
         // Store current external ID for comparison
         prevExternalId = currExternalId
 
-        // Process user traits
-        if let traits = payload.context?["traits"] as? [String: Any] {
+        // Process user traits  
+        if let traitsAnyCodable = payload.context?["traits"],
+           let traits = traitsAnyCodable.value as? [String: Any] {
             processTraits(traits: traits)
         }
 
@@ -437,7 +439,8 @@ private extension BrazeIntegration {
      */
     func needUpdate(key: String, currentValue: Any) -> Any? {
         guard supportDedup, let previousPayload = previousIdentifyPayload,
-              let prevTraits = previousPayload.context?["traits"] as? [String: Any],
+              let prevTraitsAnyCodable = previousPayload.context?["traits"],
+              let prevTraits = prevTraitsAnyCodable.value as? [String: Any],
               let prevValue = prevTraits[key] else {
             return currentValue
         }
