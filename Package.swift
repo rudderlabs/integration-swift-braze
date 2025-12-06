@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "integration-swift-braze",
+    name: "RudderIntegrationBraze",
     platforms: [
         .iOS(.v15),
         .tvOS(.v15)
