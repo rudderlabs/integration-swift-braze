@@ -35,6 +35,9 @@ class MockBrazeAdapter: BrazeAdapter {
 
     func initialize(configuration: Braze.Configuration) -> Bool {
         initializeCallCount += 1
+        // Note: We can't access private apiKey and endpoint properties from Braze.Configuration
+        // So we'll capture them through a different approach using reflection if needed
+        // For now, we'll just track that initialization was called
         if shouldFailInitialization {
             isInitialized = false
             return false
@@ -151,6 +154,41 @@ struct BrazeTestData {
             "appKey": "test-api-key-123",
             "dataCenter": "INVALID-DC",
             "supportDedup": true
+        ]
+    }
+
+    // MARK: - Platform-Specific API Key Test Configurations
+
+    static var configWithIosApiKey: [String: Any] {
+        [
+            "appKey": "legacyAppKey",
+            "iosApiKey": "iosSpecificApiKey",
+            "usePlatformSpecificApiKeys": true,
+            "dataCenter": "US-03",
+            "supportDedup": true,
+            "connectionMode": "device"
+        ]
+    }
+
+    static var configWithFlagDisabled: [String: Any] {
+        [
+            "appKey": "legacyAppKey",
+            "iosApiKey": "iosSpecificApiKey",
+            "usePlatformSpecificApiKeys": false,
+            "dataCenter": "US-03",
+            "supportDedup": true,
+            "connectionMode": "device"
+        ]
+    }
+
+    static var configWithBlankIosApiKey: [String: Any] {
+        [
+            "appKey": "legacyAppKey",
+            "iosApiKey": " ",
+            "usePlatformSpecificApiKeys": true,
+            "dataCenter": "US-03",
+            "supportDedup": true,
+            "connectionMode": "device"
         ]
     }
 

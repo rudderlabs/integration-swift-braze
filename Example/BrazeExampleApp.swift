@@ -57,7 +57,7 @@ extension AnalyticsManager {
         let options = RudderOption(
             externalIds: [ExternalId(type: "brazeExternalId", id: "2d31d085-4d93-4126-b2b3-94e651810673")]
         )
-        
+
         let birthday = Date()
         let traits: [String: Any] = [
             "birthday": birthday,
@@ -94,7 +94,7 @@ extension AnalyticsManager {
                 "ad_creative": "ad_creative value"
             ]
         ]
-        
+
         analytics?.track(name: "Install Attributed", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Install Attributed event with campaign")
     }
@@ -110,7 +110,7 @@ extension AnalyticsManager {
         let properties: [String: Any] = [
             "products": []
         ]
-        
+
         analytics?.track(name: "Order Completed", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Order Completed event with empty products array")
     }
@@ -127,7 +127,7 @@ extension AnalyticsManager {
             "currency": "INR",
             "Key-1": "Value-1"
         ]
-        
+
         analytics?.track(name: "Order Completed", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Order Completed event with single product and revenue")
     }
@@ -141,7 +141,7 @@ extension AnalyticsManager {
             ]],
             "currency": "INR"
         ]
-        
+
         analytics?.track(name: "Order Completed", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Order Completed event with single product (simple)")
     }
@@ -162,7 +162,7 @@ extension AnalyticsManager {
             ],
             "currency": "INR"
         ]
-        
+
         analytics?.track(name: "Order Completed", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Order Completed event with multiple products")
     }
@@ -178,7 +178,7 @@ extension AnalyticsManager {
             ]],
             "currency": "INR"
         ]
-        
+
         analytics?.track(name: "Ecomm track events", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Ecomm track events")
     }
@@ -188,7 +188,7 @@ extension AnalyticsManager {
             "key_1": "value_1",
             "key_2": "value_2"
         ]
-        
+
         analytics?.track(name: "New Track event", properties: properties)
         LoggerAnalytics.debug("✅ Tracked custom event with properties")
     }
