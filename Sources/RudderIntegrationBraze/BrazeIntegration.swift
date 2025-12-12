@@ -56,8 +56,20 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      */
     public func create(destinationConfig: [String: Any]) throws {
         // Extract configuration values
-        guard let apiToken = destinationConfig["appKey"] as? String, !apiToken.isEmpty else {
+        guard let legacyApiToken = destinationConfig["appKey"] as? String, !legacyApiToken.isEmpty else {
             LoggerAnalytics.error("API Token is invalid. Aborting Braze SDK initialization.")
+            throw BrazeIntegrationError.invalidAPIToken
+        }
+
+        // Resolve the API key to use
+        let resolvedApiKey = getResolvedApiKey(
+            legacyKey: legacyApiToken,
+            iosApiKey: destinationConfig["iosApiKey"] as? String,
+            usePlatformSpecificApiKeys: destinationConfig["usePlatformSpecificApiKeys"] as? Bool ?? false
+        )
+
+        guard !resolvedApiKey.isEmpty else {
+            LoggerAnalytics.error("Invalid API key. Aborting Braze initialization.")
             throw BrazeIntegrationError.invalidAPIToken
         }
 
@@ -71,7 +83,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         let endpoint = try getBrazeEndpoint(from: destinationConfig)
 
         // Create Braze configuration with endpoint
-        let configuration = Braze.Configuration(apiKey: apiToken, endpoint: endpoint)
+        let configuration = Braze.Configuration(apiKey: resolvedApiKey, endpoint: endpoint)
 
         // Set log level based on RudderStack log level - will be set after Braze instance creation
 
@@ -158,6 +170,28 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         brazeAdapter.requestImmediateDataFlush()
         LoggerAnalytics.debug("Braze requestImmediateDataFlush")
     }
+}
+
+extension BrazeIntegration {
+
+    /**
+     * Resolves the API key to use based on platform-specific configuration.
+     * Prefers iosApiKey when usePlatformSpecificApiKeys is enabled and iosApiKey is not blank.
+     * Falls back to the legacy apiKey otherwise.
+     */
+    func getResolvedApiKey(legacyKey: String, iosApiKey: String?, usePlatformSpecificApiKeys: Bool) -> String {
+        if usePlatformSpecificApiKeys {
+            if let iosKey = iosApiKey, !iosKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return iosKey
+            } else {
+                LoggerAnalytics.warn("BrazeIntegration: Configured to use platform-specific API keys but iOS API key is not valid. Falling back to the default API key.")
+                return legacyKey
+            }
+        } else {
+            return legacyKey
+        }
+    }
+
 }
 
 // MARK: - Private Helper Methods

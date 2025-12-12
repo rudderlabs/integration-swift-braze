@@ -112,6 +112,89 @@ struct BrazeIntegrationTests {
         #expect(mockAdapter.initializeCallCount == 1) // Only from create call
     }
 
+    // MARK: - Platform-Specific API Key Tests
+
+    @Test("Given platform-specific key is enabled and iosApiKey is present, when integration is initialized, then iosApiKey should be used")
+    func testPlatformSpecificKeyEnabledWithIosApiKey() throws {
+        let mockAdapter = MockBrazeAdapter()
+        let brazeIntegration = createBrazeIntegration(mockAdapter: mockAdapter)
+        brazeIntegration.analytics = createMockAnalytics()
+
+        let config = BrazeTestData.configWithIosApiKey
+        let resolvedKey = brazeIntegration.getResolvedApiKey(
+            legacyKey: config["appKey"] as! String,
+            iosApiKey: config["iosApiKey"] as? String,
+            usePlatformSpecificApiKeys: config["usePlatformSpecificApiKeys"] as? Bool ?? false
+        )
+
+        try brazeIntegration.create(destinationConfig: config)
+
+        #expect(mockAdapter.initializeCallCount == 1)
+        #expect(mockAdapter.isInitialized == true)
+        #expect(resolvedKey == "iosSpecificApiKey")
+    }
+
+    @Test("Given platform-specific key flag is disabled, when integration is initialized, then legacy appKey should be used")
+    func testPlatformSpecificKeyFlagDisabled() throws {
+        let mockAdapter = MockBrazeAdapter()
+        let brazeIntegration = createBrazeIntegration(mockAdapter: mockAdapter)
+        brazeIntegration.analytics = createMockAnalytics()
+
+        let config = BrazeTestData.configWithFlagDisabled
+        let resolvedKey = brazeIntegration.getResolvedApiKey(
+            legacyKey: config["appKey"] as! String,
+            iosApiKey: config["iosApiKey"] as? String,
+            usePlatformSpecificApiKeys: config["usePlatformSpecificApiKeys"] as? Bool ?? false
+        )
+
+        try brazeIntegration.create(destinationConfig: config)
+
+        #expect(mockAdapter.initializeCallCount == 1)
+        #expect(mockAdapter.isInitialized == true)
+        #expect(resolvedKey == "legacyAppKey")
+    }
+
+    @Test("Given platform-specific key is enabled but iosApiKey is blank, when integration is initialized, then legacy appKey should be used as fallback")
+    func testPlatformSpecificKeyEnabledButBlankIosApiKey() throws {
+        let mockAdapter = MockBrazeAdapter()
+        let brazeIntegration = createBrazeIntegration(mockAdapter: mockAdapter)
+        brazeIntegration.analytics = createMockAnalytics()
+
+        let config = BrazeTestData.configWithBlankIosApiKey
+        let resolvedKey = brazeIntegration.getResolvedApiKey(
+            legacyKey: config["appKey"] as! String,
+            iosApiKey: config["iosApiKey"] as? String,
+            usePlatformSpecificApiKeys: config["usePlatformSpecificApiKeys"] as? Bool ?? false
+        )
+
+        try brazeIntegration.create(destinationConfig: config)
+
+        #expect(mockAdapter.initializeCallCount == 1)
+        #expect(mockAdapter.isInitialized == true)
+        #expect(resolvedKey == "legacyAppKey")
+    }
+
+    @Test("Given platform-specific key is enabled but iosApiKey is missing, when integration is initialized, then legacy appKey should be used as fallback")
+    func testPlatformSpecificKeyEnabledButMissingIosApiKey() throws {
+        let mockAdapter = MockBrazeAdapter()
+        let brazeIntegration = createBrazeIntegration(mockAdapter: mockAdapter)
+        brazeIntegration.analytics = createMockAnalytics()
+
+        var configWithoutIosKey = BrazeTestData.configWithIosApiKey
+        configWithoutIosKey.removeValue(forKey: "iosApiKey") // Remove the iosApiKey
+        let resolvedKey = brazeIntegration.getResolvedApiKey(
+            legacyKey: configWithoutIosKey["appKey"] as! String,
+            iosApiKey: configWithoutIosKey["iosApiKey"] as? String,
+            usePlatformSpecificApiKeys: configWithoutIosKey["usePlatformSpecificApiKeys"] as? Bool ?? false
+        )
+
+        try brazeIntegration.create(destinationConfig: configWithoutIosKey)
+
+        #expect(mockAdapter.initializeCallCount == 1)
+        #expect(mockAdapter.isInitialized == true)
+        #expect(resolvedKey == "legacyAppKey")
+    }
+
     // MARK: - Identify Event Tests - Device Mode
 
     @Test("Given device mode and basic user traits, when identify is called, then user attributes are set")
@@ -131,7 +214,7 @@ struct BrazeIntegrationTests {
 
         #expect(mockAdapter.changeUserCalls.count == 1)
         #expect(mockAdapter.changeUserCalls[0] == "test_user_123")
-        
+
         verifyBasicUserAttributes(mockAdapter)
     }
 
@@ -161,7 +244,7 @@ struct BrazeIntegrationTests {
         verifyGenderAttribute(mockAdapter, expectedValue: Braze.User.Gender.male)
         verifyHomeCityAttribute(mockAdapter, expectedValue: "San Francisco")
         verifyCountryAttribute(mockAdapter, expectedValue: "USA")
-        
+
         // Verify custom attributes with actual values
         verifyCustomAttribute(mockAdapter, key: "customString", expectedValue: "custom_value")
         verifyCustomAttribute(mockAdapter, key: "customBool", expectedValue: true)
@@ -188,7 +271,7 @@ struct BrazeIntegrationTests {
 
         #expect(mockAdapter.changeUserCalls.count == 1)
         #expect(mockAdapter.changeUserCalls[0] == "braze_external_123") // Should use external ID, not user ID
-        
+
         verifyBasicUserAttributes(mockAdapter)
     }
 
@@ -207,7 +290,7 @@ struct BrazeIntegrationTests {
 
         // First identify call
         brazeIntegration.identify(payload: identifyEvent)
-        
+
         // Verify first call set correct attributes
         verifyBasicUserAttributes(mockAdapter)
         let firstCallAttributeCount = mockAdapter.setUserAttributeCalls.count
@@ -257,14 +340,14 @@ struct BrazeIntegrationTests {
         brazeIntegration.identify(payload: secondIdentifyEvent)
 
         #expect(mockAdapter.changeUserCalls.count == 0) // User ID unchanged
-        
+
         // Verify changed attributes were updated with actual values from BrazeTestData.updatedUserTraits
         verifyEmailAttribute(mockAdapter, expectedValue: "updated@example.com")
         verifyFirstNameAttribute(mockAdapter, expectedValue: "Jane")
         verifyLastNameAttribute(mockAdapter, expectedValue: "Smith")
         verifyPhoneAttribute(mockAdapter, expectedValue: "+0987654321")
         verifyGenderAttribute(mockAdapter, expectedValue: Braze.User.Gender.female)
-        
+
         // Verify custom attribute changes
         verifyCustomAttribute(mockAdapter, key: "customString", expectedValue: "updated_value")
     }
@@ -296,7 +379,7 @@ struct BrazeIntegrationTests {
 
         #expect(mockAdapter.changeUserCalls.count == 0) // User ID unchanged
         #expect(mockAdapter.setUserAttributeCalls.count == firstCallAttributeCount) // All attributes set again
-        
+
         // Verify attributes are set correctly on second call
         verifyBasicUserAttributes(mockAdapter)
     }
@@ -1106,9 +1189,9 @@ struct BrazeIntegrationTests {
 
 // MARK: - Test Helper Extension
 extension BrazeIntegrationTests {
-    
+
     // MARK: - Helper Functions for Attribute Verification
-    
+
     private func verifyEmailAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: String) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .email(let value) = attr, value == expectedValue {
@@ -1118,7 +1201,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyFirstNameAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: String) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .firstName(let value) = attr, value == expectedValue {
@@ -1128,7 +1211,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyLastNameAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: String) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .lastName(let value) = attr, value == expectedValue {
@@ -1138,7 +1221,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyPhoneAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: String) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .phoneNumber(let value) = attr, value == expectedValue {
@@ -1148,7 +1231,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyGenderAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: Braze.User.Gender) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .gender(let value) = attr, value == expectedValue {
@@ -1158,7 +1241,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyHomeCityAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: String) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .homeCity(let value) = attr, value == expectedValue {
@@ -1168,7 +1251,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyCountryAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: String) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .country(let value) = attr, value == expectedValue {
@@ -1178,18 +1261,18 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyCustomAttribute<T: Equatable>(_ mockAdapter: MockBrazeAdapter, key: String, expectedValue: T) {
         let attribute = mockAdapter.setCustomAttributeCalls.first { $0.key == key }
         #expect(attribute?.value as? T == expectedValue)
     }
-    
+
     private func verifyBasicUserAttributes(_ mockAdapter: MockBrazeAdapter) {
         verifyEmailAttribute(mockAdapter, expectedValue: "test@example.com")
         verifyFirstNameAttribute(mockAdapter, expectedValue: "John")
         verifyLastNameAttribute(mockAdapter, expectedValue: "Doe")
     }
-    
+
     private func verifyBirthdayAttribute(_ mockAdapter: MockBrazeAdapter, expectedValue: Date) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .dateOfBirth(let value) = attr, value == expectedValue {
@@ -1199,7 +1282,7 @@ extension BrazeIntegrationTests {
         }
         #expect(attribute != nil)
     }
-    
+
     private func verifyAttributionDataAttribute(_ mockAdapter: MockBrazeAdapter) {
         let attribute = mockAdapter.setUserAttributeCalls.first { attr in
             if case .attributionData = attr {
