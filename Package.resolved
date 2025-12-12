@@ -1,0 +1,24 @@
+{
+  "originHash" : "49a83bff047c82d00505c7590e51d743d07206d932c30bdf54c6820cdc879cf2",
+  "pins" : [
+    {
+      "identity" : "braze-swift-sdk-prebuilt-static",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static",
+      "state" : {
+        "revision" : "8be16a8beed853741e4d98aa36ed6a3f94693137",
+        "version" : "12.1.0"
+      }
+    },
+    {
+      "identity" : "rudder-sdk-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rudderlabs/rudder-sdk-swift.git",
+      "state" : {
+        "branch" : "feat/sdk-502-make-standard-integration-public",
+        "revision" : "30b33dc0ff62ae72f16ebf63ec7da98f5d993011"
+      }
+    }
+  ],
+  "version" : 3
+}
