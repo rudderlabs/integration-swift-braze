@@ -1,7 +1,18 @@
-# Xcode
-#
-# gitignore contributors: Feel free to update this file as needed for the integrations.
+# ------------------------------------
+# Swift Package Manager
+# ------------------------------------
+/.build/
+.swiftpm/
+Packages/
+Package.pins
+Package.resolved
 
+# Credentials
+.netrc
+
+# ------------------------------------
+# Xcode
+# ------------------------------------
 ## User settings
 xcuserdata/
 
@@ -17,28 +28,28 @@ xcuserdata/
 timeline.xctimeline
 playground.xcworkspace
 
-## Swift Package Manager
-/.build/
-.netrc
-.swiftpm/
-
-# Dependency management files (not needed for libraries)
-Packages/
-Package.pins
-
-# Example app build artifacts
-Example/.build
-
 # Xcode user-specific files
-xcuserdata/
 *.xcuserstate
 DerivedData/
 
+# Xcode project files (optional — uncomment if needed)
+# *.xcodeproj
+# *.xcworkspace
+
+# ------------------------------------
+# Example app build artifacts
+# ------------------------------------
+Example/.build
+
+# ------------------------------------
 # macOS and editor metadata
+# ------------------------------------
 .DS_Store
 *.swp
 *.swo
 *.tmp
 
+# ------------------------------------
 # Logs
+# ------------------------------------
 *.log
