@@ -13,7 +13,22 @@ Package.resolved
 # ------------------------------------
 # Xcode
 # ------------------------------------
+## User settings
 xcuserdata/
+
+## Obj-C/Swift specific
+*.hmap
+
+## App packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Xcode user-specific files
 *.xcuserstate
 DerivedData/
 
@@ -22,30 +37,12 @@ DerivedData/
 # *.xcworkspace
 
 # ------------------------------------
-# Obj-C/Swift specific
-# ------------------------------------
-*.hmap
-
-# ------------------------------------
-# App Packaging (for example apps)
-# ------------------------------------
-*.ipa
-*.dSYM
-*.dSYM.zip
-
-# ------------------------------------
-# Playgrounds
-# ------------------------------------
-timeline.xctimeline
-playground.xcworkspace
-
-# ------------------------------------
 # Example app build artifacts
 # ------------------------------------
 Example/.build
 
 # ------------------------------------
-# macOS & Editor junk
+# macOS and editor metadata
 # ------------------------------------
 .DS_Store
 *.swp
