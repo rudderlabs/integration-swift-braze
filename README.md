@@ -29,10 +29,14 @@ The Braze integration allows you to send your event data from RudderStack to Bra
 Add the Braze integration to your Swift project using Swift Package Manager:
 
 1. In Xcode, go to `File > Add Package Dependencies`
+    <img width="960" height="540" alt="add_package_dependency" src="https://github.com/user-attachments/assets/56f2673c-127b-4766-b570-c07523c6bda4" />
 2. Enter the package repository URL: `https://github.com/rudderlabs/integration-swift-braze` in the search bar
 3. Select the version you want to use
+    <img width="1075" height="597" alt="image" src="https://github.com/user-attachments/assets/0ea6c8d1-efeb-4589-a92c-d1763a19e63e" />
 4. Select the target to which you want to add the package
 5. Finally, click on **Add Package**
+
+    <img width="650" height="289" alt="image" src="https://github.com/user-attachments/assets/dde6889d-3966-42f6-96e3-7919a0bf2d58" />
 
 Alternatively, add it to your `Package.swift` file:
 
