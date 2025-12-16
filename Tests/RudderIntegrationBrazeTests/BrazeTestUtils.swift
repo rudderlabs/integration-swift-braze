@@ -17,27 +17,22 @@ class MockBrazeAdapter: BrazeAdapter {
 
     // MARK: - Tracking Variables
     var isInitialized = false
-    var initializeCallCount = 0
+    var initSDKCalls: [(apiKey: String, endpoint: String, logLevel: LogLevel)] = []
     var changeUserCalls: [String] = []
     var addUserAliasCalls: [(alias: String, label: String)] = []
     var setUserAttributeCalls: [BrazeUserAttribute] = []
-    var setCustomAttributeCalls: [(key: String, value: Any)] = []
+    var setTraitsCalls: [IdentifyTraits] = []
     var logCustomEventCalls: [(name: String, properties: [String: Any]?)] = []
     var logPurchaseCalls: [(productId: String, currency: String, price: Double, quantity: Int, properties: [String: Any]?)] = []
     var requestImmediateDataFlushCallCount = 0
-    var setLogLevelCalls: [Braze.Configuration.Logger.Level] = []
 
     // MARK: - Configuration
     var shouldFailInitialization = false
-    var shouldFailUserAliasAddition = false
 
     // MARK: - BrazeAdapter Implementation
 
-    func initialize(configuration: Braze.Configuration) -> Bool {
-        initializeCallCount += 1
-        // Note: We can't access private apiKey and endpoint properties from Braze.Configuration
-        // So we'll capture them through a different approach using reflection if needed
-        // For now, we'll just track that initialization was called
+    func initSDK(apiKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
+        initSDKCalls.append((apiKey: apiKey, endpoint: endpoint, logLevel: logLevel))
         if shouldFailInitialization {
             isInitialized = false
             return false
@@ -50,17 +45,16 @@ class MockBrazeAdapter: BrazeAdapter {
         changeUserCalls.append(userId)
     }
 
-    func addUserAlias(_ alias: String, label: String) -> Bool {
+    func addUserAlias(_ alias: String, label: String) {
         addUserAliasCalls.append((alias: alias, label: label))
-        return !shouldFailUserAliasAddition
     }
 
     func setUserAttribute(_ attribute: BrazeUserAttribute) {
         setUserAttributeCalls.append(attribute)
     }
 
-    func setCustomAttribute(key: String, value: Any) {
-        setCustomAttributeCalls.append((key: key, value: value))
+    func setTraits(deDupedTraits: IdentifyTraits) {
+        setTraitsCalls.append(deDupedTraits)
     }
 
     func logCustomEvent(name: String, properties: [String: Any]?) {
@@ -75,10 +69,6 @@ class MockBrazeAdapter: BrazeAdapter {
         requestImmediateDataFlushCallCount += 1
     }
 
-    func setLogLevel(_ level: Braze.Configuration.Logger.Level) {
-        setLogLevelCalls.append(level)
-    }
-
     func getDestinationInstance() -> Any? {
         return isInitialized ? "MockBrazeInstance" : nil
     }
@@ -87,17 +77,15 @@ class MockBrazeAdapter: BrazeAdapter {
 
     func reset() {
         isInitialized = false
-        initializeCallCount = 0
+        initSDKCalls.removeAll()
         changeUserCalls.removeAll()
         addUserAliasCalls.removeAll()
         setUserAttributeCalls.removeAll()
-        setCustomAttributeCalls.removeAll()
+        setTraitsCalls.removeAll()
         logCustomEventCalls.removeAll()
         logPurchaseCalls.removeAll()
         requestImmediateDataFlushCallCount = 0
-        setLogLevelCalls.removeAll()
         shouldFailInitialization = false
-        shouldFailUserAliasAddition = false
     }
 }
 
@@ -120,15 +108,6 @@ struct BrazeTestData {
             "dataCenter": "US-01",
             "supportDedup": false,
             "connectionMode": "hybrid"
-        ]
-    }
-
-    static var cloudModeConfig: [String: Any] {
-        [
-            "appKey": "test-api-key-123",
-            "dataCenter": "US-01",
-            "supportDedup": false,
-            "connectionMode": "cloud"
         ]
     }
 
@@ -162,7 +141,7 @@ struct BrazeTestData {
     static var configWithIosApiKey: [String: Any] {
         [
             "appKey": "legacyAppKey",
-            "iosApiKey": "iosSpecificApiKey",
+            "iOSApiKey": "iosSpecificApiKey",
             "usePlatformSpecificApiKeys": true,
             "dataCenter": "US-03",
             "supportDedup": true,
@@ -173,7 +152,7 @@ struct BrazeTestData {
     static var configWithFlagDisabled: [String: Any] {
         [
             "appKey": "legacyAppKey",
-            "iosApiKey": "iosSpecificApiKey",
+            "iOSApiKey": "iosSpecificApiKey",
             "usePlatformSpecificApiKeys": false,
             "dataCenter": "US-03",
             "supportDedup": true,
@@ -184,7 +163,7 @@ struct BrazeTestData {
     static var configWithBlankIosApiKey: [String: Any] {
         [
             "appKey": "legacyAppKey",
-            "iosApiKey": " ",
+            "iOSApiKey": " ",
             "usePlatformSpecificApiKeys": true,
             "dataCenter": "US-03",
             "supportDedup": true,
@@ -302,8 +281,8 @@ struct BrazeTestData {
             "products": [
                 [
                     "product_id": "prod_003",
-                    "price": "25.50", // String price
-                    "quantity": "3" // String quantity
+                    "price": 25.50, // String price
+                    "quantity": 3 // String quantity
                 ]
             ]
         ]
@@ -327,7 +306,7 @@ extension BrazeTestData {
             context["traits"] = traits
         }
         if let externalIds = externalIds {
-            context["externalIds"] = externalIds
+            context["externalId"] = externalIds
         }
 
         if !context.isEmpty {
