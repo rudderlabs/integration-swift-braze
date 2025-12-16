@@ -172,7 +172,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      * Handles custom event
      */
     private func handleCustomEvent(payload: TrackEvent) {
-        let properties = payload.properties?.dictionary?.rawDictionary
+        let properties = payload.properties?.dictionary?.rawDictionary ?? [:]
         brazeAdapter.logCustomEvent(name: payload.event, properties: properties)
     }
 
