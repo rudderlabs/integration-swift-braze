@@ -87,11 +87,6 @@ extension ContentView {
             }
             .buttonStyle(SecondaryButtonStyle())
 
-            Button("Order Completed (Single Product - Simple)") {
-                analyticsManager.orderCompletedWithSingleProductSimple()
-            }
-            .buttonStyle(SecondaryButtonStyle())
-
             Button("Order Completed (Multiple Products)") {
                 analyticsManager.orderCompletedWithMultipleProducts()
             }
@@ -106,11 +101,6 @@ extension ContentView {
         VStack(spacing: 12) {
             Text("Custom Track Events")
                 .font(.headline)
-
-            Button("Ecomm Track Events") {
-                analyticsManager.ecommTrackEvents()
-            }
-            .buttonStyle(SecondaryButtonStyle())
 
             Button("Custom Track (With Properties)") {
                 analyticsManager.customTrackEventWithProperties()
