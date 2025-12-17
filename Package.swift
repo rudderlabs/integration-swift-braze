@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "integration-swift-braze",
+    name: "RudderIntegrationBraze",
     platforms: [
         .iOS(.v15),
         .tvOS(.v15)
@@ -14,12 +14,11 @@ let package = Package(
         .library(
             name: "RudderIntegrationBraze",
             targets: ["RudderIntegrationBraze"]
-        ),
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static", .upToNextMajor(from: "12.0.0")),
-        // TODO: Update rudder-sdk-swift dependency after the stable release of rudder-sdk-swift.
-        .package(url: "https://github.com/rudderlabs/rudder-sdk-swift.git", branch: "feat/sdk-502-make-standard-integration-public")
+        .package(url: "https://github.com/rudderlabs/rudder-sdk-swift.git", .upToNextMajor(from: "1.0.0"))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -34,6 +33,6 @@ let package = Package(
         .testTarget(
             name: "RudderIntegrationBrazeTests",
             dependencies: ["RudderIntegrationBraze"]
-        ),
+        )
     ]
 )
