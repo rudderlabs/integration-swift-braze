@@ -123,7 +123,6 @@ extension AnalyticsManager {
                 "price": 100.11,
                 "Product-Key-1": "Product-Value-1"
             ]],
-            "revenue": 123,
             "currency": "INR",
             "key-1": "value-1",
             "key-2": 234,
@@ -169,12 +168,12 @@ extension AnalyticsManager {
             "key_2": "value_2"
         ]
 
-        analytics?.track(name: "New Track event", properties: properties)
+        analytics?.track(name: "Custom track event with properties", properties: properties)
         LoggerAnalytics.debug("✅ Tracked custom event with properties")
     }
 
     func customTrackEventWithoutProperties() {
-        analytics?.track(name: "New Track event")
+        analytics?.track(name: "Custom track event without properties")
         LoggerAnalytics.debug("✅ Tracked custom event without properties")
     }
 }
