@@ -24,7 +24,7 @@ private let brazeExternalIdKey = "brazeExternalId"
  *
  * - Throws: DecodingError if resolved apiKey or customEndpoint is invalid.
  */
-internal struct RudderBrazeConfig: Codable {
+struct RudderBrazeConfig: Codable {
 
     let apiKey: String
     let iOSApiKey: String?
@@ -48,7 +48,7 @@ internal struct RudderBrazeConfig: Codable {
      * Prefers iOSApiKey when usePlatformSpecificApiKeys is enabled and iOSApiKey is not blank.
      * Falls back to the legacy apiKey otherwise.
      */
-    internal var resolvedApiKey: String {
+    var resolvedApiKey: String {
         if usePlatformSpecificApiKeys {
             if let iosKey = iOSApiKey, !iosKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return iosKey
@@ -92,7 +92,7 @@ internal struct RudderBrazeConfig: Codable {
         }
     }
 
-    internal func isHybridMode() -> Bool {
+    func isHybridMode() -> Bool {
         switch connectionMode {
         case .hybrid:
             LoggerAnalytics.verbose("BrazeIntegration: As connection mode is set to hybrid, dropping event request.")
@@ -106,7 +106,7 @@ internal struct RudderBrazeConfig: Codable {
 /**
  * Enum representing the connection modes for Braze Integration.
  */
-internal enum ConnectionMode: String, Codable {
+enum ConnectionMode: String, Codable {
 
     /**
      * Represents the hybrid connection mode.
@@ -161,7 +161,7 @@ private struct CustomEndpointDecoder {
  * - Parameters:
  *   - campaign: The campaign details associated with the install. Can be nil if user does not provide any.
  */
-internal struct InstallAttributed: Codable {
+struct InstallAttributed: Codable {
     let campaign: Campaign?
 }
 
@@ -174,7 +174,7 @@ internal struct InstallAttributed: Codable {
  *   - adGroup: The ad group name of the campaign.
  *   - adCreative: The ad creative name/ID used in the campaign.
  */
-internal struct Campaign: Codable {
+struct Campaign: Codable {
     let source: String?
     let name: String?
     let adGroup: String?
@@ -195,7 +195,7 @@ internal struct Campaign: Codable {
  *   - currency: The currency code used for the transaction. Defaults to "USD".
  *   - products: List of products included in the transaction. Defaults to empty array.
  */
-internal struct StandardProperties: Codable {
+struct StandardProperties: Codable {
     let currency: String
     let products: [Product]
 
@@ -216,7 +216,7 @@ internal struct StandardProperties: Codable {
  *   - productId: The unique identifier for the product.
  *   - price: The price of the product as a Double.
  */
-internal struct Product: Codable {
+struct Product: Codable {
     let productId: String?
     let price: Double
     let quantity: Int
@@ -274,12 +274,12 @@ internal struct Product: Codable {
  *   - context: The context associated with the user.
  *   - customTraits: The custom traits associated with the user.
  */
-public struct IdentifyTraits {
-    public let userId: String?
-    public let context: Context
-    public let customTraits: [String: Any]
+struct IdentifyTraits {
+    let userId: String?
+    let context: Context
+    let customTraits: [String: Any]
 
-    public init(userId: String? = nil, context: Context = Context(), customTraits: [String: Any] = [:]) {
+    init(userId: String? = nil, context: Context = Context(), customTraits: [String: Any] = [:]) {
         self.userId = userId
         self.context = context
         self.customTraits = customTraits
@@ -293,11 +293,11 @@ public struct IdentifyTraits {
  *   - traits: The traits associated with the user.
  *   - externalId: The external identifiers associated with the user.
  */
-public struct Context: Codable {
-    public let traits: Traits
-    public let externalId: [ExternalId]?
+struct Context: Codable {
+    let traits: Traits
+    let externalId: [ExternalId]?
 
-    public init(traits: Traits = Traits(), externalId: [ExternalId]? = nil) {
+    init(traits: Traits = Traits(), externalId: [ExternalId]? = nil) {
         self.traits = traits
         self.externalId = externalId
     }
@@ -305,7 +305,7 @@ public struct Context: Codable {
     /**
      * Returns the Braze external identifier for the user.
      */
-    public var brazeExternalId: String? {
+    var brazeExternalId: String? {
         return externalId?.first(where: { $0.type == brazeExternalIdKey })?.id
     }
 }
@@ -317,9 +317,9 @@ public struct Context: Codable {
  *   - type: The type of external identifier.
  *   - id: The identifier value.
  */
-public struct ExternalId: Codable, Equatable {
-    public let type: String
-    public let id: String
+struct ExternalId: Codable, Equatable {
+    let type: String
+    let id: String
 }
 
 /**
@@ -334,16 +334,16 @@ public struct ExternalId: Codable, Equatable {
  *   - address: The address of the user.
  *   - birthday: The birthday of the user.
  */
-public struct Traits: Codable {
-    public let email: String?
-    public let firstName: String?
-    public let lastName: String?
-    public let gender: String?
-    public let phone: String?
-    public let address: Address?
-    public let birthday: Date?
+struct Traits: Codable {
+    let email: String?
+    let firstName: String?
+    let lastName: String?
+    let gender: String?
+    let phone: String?
+    let address: Address?
+    let birthday: Date?
 
-    public init(
+    init(
         email: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
@@ -361,7 +361,7 @@ public struct Traits: Codable {
         self.birthday = birthday
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         email = try container.decodeIfPresent(String.self, forKey: .email)
@@ -396,11 +396,11 @@ public struct Traits: Codable {
  *   - city: The city of the user.
  *   - country: The country of the user.
  */
-public struct Address: Codable, Equatable {
-    public let city: String?
-    public let country: String?
+struct Address: Codable, Equatable {
+    let city: String?
+    let country: String?
 
-    public init(city: String? = nil, country: String? = nil) {
+    init(city: String? = nil, country: String? = nil) {
         self.city = city
         self.country = country
     }
