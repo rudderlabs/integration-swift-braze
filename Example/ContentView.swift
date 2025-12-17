@@ -37,6 +37,9 @@ struct ContentView: View {
 
                     // Custom Track Events
                     customTrackEventsSection
+
+                    // Flush Section
+                    flushSection
                 }
                 .padding()
             }
@@ -87,11 +90,6 @@ extension ContentView {
             }
             .buttonStyle(SecondaryButtonStyle())
 
-            Button("Order Completed (Single Product - Simple)") {
-                analyticsManager.orderCompletedWithSingleProductSimple()
-            }
-            .buttonStyle(SecondaryButtonStyle())
-
             Button("Order Completed (Multiple Products)") {
                 analyticsManager.orderCompletedWithMultipleProducts()
             }
@@ -107,11 +105,6 @@ extension ContentView {
             Text("Custom Track Events")
                 .font(.headline)
 
-            Button("Ecomm Track Events") {
-                analyticsManager.ecommTrackEvents()
-            }
-            .buttonStyle(SecondaryButtonStyle())
-
             Button("Custom Track (With Properties)") {
                 analyticsManager.customTrackEventWithProperties()
             }
@@ -124,6 +117,21 @@ extension ContentView {
         }
         .padding()
         .background(Color.orange.opacity(0.1))
+        .cornerRadius(10)
+    }
+
+    var flushSection: some View {
+        VStack(spacing: 12) {
+            Text("Queue Management")
+                .font(.headline)
+
+            Button("Flush") {
+                analyticsManager.flush()
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        }
+        .padding()
+        .background(Color.purple.opacity(0.1))
         .cornerRadius(10)
     }
 

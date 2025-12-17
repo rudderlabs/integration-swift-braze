@@ -58,20 +58,20 @@ extension AnalyticsManager {
             externalIds: [ExternalId(type: "brazeExternalId", id: "2d31d085-4d93-4126-b2b3-94e651810673")]
         )
 
-        let birthday = Date()
         let traits: [String: Any] = [
-            "birthday": birthday,
+            "email": "test@gmail.com",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "gender": "Male",
+            "phone": "0123456789",
             "address": [
                 "city": "Kolkata",
                 "country": "India"
             ],
-            "firstname": "First Name",
-            "lastname": "Last Name",
-            "gender": "Male",
-            "phone": "0123456789",
-            "email": "test@gmail.com",
+            "birthday": Date(),
             "key-1": "value-1",
-            "key-2": 1234
+            "key-2": 12341,
+            "key-3": "1990-01-15T00:00:00.000Z",
         ]
 
         analytics?.identify(userId: "userid ios 1", traits: traits, options: options)
@@ -123,27 +123,13 @@ extension AnalyticsManager {
                 "price": 100.11,
                 "Product-Key-1": "Product-Value-1"
             ]],
-            "revenue": 123,
             "currency": "INR",
-            "Key-1": "Value-1"
+            "key-1": "value-1",
+            "key-2": 234,
         ]
 
         analytics?.track(name: "Order Completed", properties: properties)
         LoggerAnalytics.debug("✅ Tracked Order Completed event with single product and revenue")
-    }
-
-    func orderCompletedWithSingleProductSimple() {
-        let properties: [String: Any] = [
-            "products": [[
-                "product_id": "1002",
-                "quantity": 12,
-                "price": 100.22
-            ]],
-            "currency": "INR"
-        ]
-
-        analytics?.track(name: "Order Completed", properties: properties)
-        LoggerAnalytics.debug("✅ Tracked Order Completed event with single product (simple)")
     }
 
     func orderCompletedWithMultipleProducts() {
@@ -152,15 +138,22 @@ extension AnalyticsManager {
                 [
                     "product_id": "1002",
                     "quantity": 12,
-                    "price": 100.22
+                    "price": 100.22,
+                    "product-key-1": "product-value-1",
+                    "product-key-2": 123,
                 ],
                 [
                     "product_id": "1003",
                     "quantity": 5,
-                    "price": 89.50
+                    "price": 89.50,
+                    "product-key-3": "product-value-3",
+                    "product-key-4": 456,
                 ]
             ],
-            "currency": "INR"
+            "currency": "INR",
+            "key-1": "value-1",
+            "key-2": 234,
+            "key-3": "1990-01-15T00:00:00.000Z",
         ]
 
         analytics?.track(name: "Order Completed", properties: properties)
@@ -169,32 +162,25 @@ extension AnalyticsManager {
 
     // MARK: - Custom Track Events
 
-    func ecommTrackEvents() {
-        let properties: [String: Any] = [
-            "products": [[
-                "product_id": "1002",
-                "quantity": 12,
-                "price": 100.22
-            ]],
-            "currency": "INR"
-        ]
-
-        analytics?.track(name: "Ecomm track events", properties: properties)
-        LoggerAnalytics.debug("✅ Tracked Ecomm track events")
-    }
-
     func customTrackEventWithProperties() {
         let properties: [String: Any] = [
             "key_1": "value_1",
             "key_2": "value_2"
         ]
 
-        analytics?.track(name: "New Track event", properties: properties)
+        analytics?.track(name: "Custom track event with properties", properties: properties)
         LoggerAnalytics.debug("✅ Tracked custom event with properties")
     }
 
     func customTrackEventWithoutProperties() {
-        analytics?.track(name: "New Track event")
+        analytics?.track(name: "Custom track event without properties")
         LoggerAnalytics.debug("✅ Tracked custom event without properties")
+    }
+
+    // MARK: - Flush
+
+    func flush() {
+        analytics?.flush()
+        LoggerAnalytics.debug("✅ Flushed analytics queue")
     }
 }
