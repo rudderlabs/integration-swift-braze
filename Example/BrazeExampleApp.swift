@@ -176,4 +176,11 @@ extension AnalyticsManager {
         analytics?.track(name: "Custom track event without properties")
         LoggerAnalytics.debug("✅ Tracked custom event without properties")
     }
+
+    // MARK: - Flush
+
+    func flush() {
+        analytics?.flush()
+        LoggerAnalytics.debug("✅ Flushed analytics queue")
+    }
 }

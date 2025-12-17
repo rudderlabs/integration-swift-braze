@@ -37,6 +37,9 @@ struct ContentView: View {
 
                     // Custom Track Events
                     customTrackEventsSection
+
+                    // Flush Section
+                    flushSection
                 }
                 .padding()
             }
@@ -114,6 +117,21 @@ extension ContentView {
         }
         .padding()
         .background(Color.orange.opacity(0.1))
+        .cornerRadius(10)
+    }
+
+    var flushSection: some View {
+        VStack(spacing: 12) {
+            Text("Queue Management")
+                .font(.headline)
+
+            Button("Flush") {
+                analyticsManager.flush()
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        }
+        .padding()
+        .background(Color.purple.opacity(0.1))
         .cornerRadius(10)
     }
 
