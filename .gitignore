@@ -1,25 +1,48 @@
 # ------------------------------------
-# Swift Package Manager (Root Package)
+# Swift Package Manager
 # ------------------------------------
 /.build/
 .swiftpm/
+Packages/
 Package.pins
 Package.resolved
 
+# Credentials
+.netrc
+
 # ------------------------------------
-# Xcode (for Example/ app or if pkg opened with Xcode)
+# Xcode
 # ------------------------------------
+## User settings
 xcuserdata/
+
+## Obj-C/Swift specific
+*.hmap
+
+## App packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Xcode user-specific files
 *.xcuserstate
 DerivedData/
 
-# Example app build artifacts
-Example/.build
-
-Example/GoogleService-Info.plist
+# Xcode project files (optional — uncomment if needed)
+# *.xcodeproj
+# *.xcworkspace
 
 # ------------------------------------
-# macOS & Editor junk
+# Example app build artifacts
+# ------------------------------------
+Example/.build
+
+# ------------------------------------
+# macOS and editor metadata
 # ------------------------------------
 .DS_Store
 *.swp
@@ -30,8 +53,3 @@ Example/GoogleService-Info.plist
 # Logs
 # ------------------------------------
 *.log
-
-# ------------------------------------
-# Private Credentials
-# ------------------------------------
-.netrc
