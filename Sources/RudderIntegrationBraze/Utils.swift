@@ -14,7 +14,7 @@ import RudderStackAnalytics
  * This function sanitizes the dictionary to handle non-JSON-serializable types (Date, URL, NSURL, NSNull)
  * before serialization to ensure compatibility with JSONSerialization.
  */
-internal func parse<T: Decodable>(_ dictionary: [String: Any]) -> T? {
+func parse<T: Decodable>(_ dictionary: [String: Any]) -> T? {
     guard !dictionary.isEmpty else {
         LoggerAnalytics.debug("BrazeIntegration: The configuration is empty.")
         return nil
@@ -37,7 +37,7 @@ internal func parse<T: Decodable>(_ dictionary: [String: Any]) -> T? {
  *
  * - Returns: StandardProperties object parsed from the dictionary.
  */
-internal func getStandardProperties(_ properties: [String: Any]) -> StandardProperties {
+func getStandardProperties(_ properties: [String: Any]) -> StandardProperties {
     return parse(properties) ?? StandardProperties()
 }
 
@@ -52,7 +52,7 @@ internal func getStandardProperties(_ properties: [String: Any]) -> StandardProp
  *   - productKeys: The list of keys to be filtered from the products array.
  * - Returns: Dictionary with the filtered values.
  */
-internal func filter(
+func filter(
     properties: [String: Any],
     rootKeys: [String],
     productKeys: [String] = []
@@ -102,7 +102,7 @@ private func filterKeysFromArray(products: [[String: Any]], keys: [String]) -> [
 /**
  * Extension function to get the `brazeExternalId` if it exists, otherwise the userId.
  */
-internal func getExternalIdOrUserId(from traits: IdentifyTraits) -> String? {
+func getExternalIdOrUserId(from traits: IdentifyTraits) -> String? {
     if let externalId = traits.context.brazeExternalId, !externalId.isEmpty {
         return externalId
     }
@@ -115,7 +115,7 @@ internal func getExternalIdOrUserId(from traits: IdentifyTraits) -> String? {
  * - Parameter event: The IdentifyEvent to convert
  * - Returns: The IdentifyTraits object parsed from the IdentifyEvent.
  */
-internal func toIdentifyTraits(from event: IdentifyEvent) -> IdentifyTraits {
+func toIdentifyTraits(from event: IdentifyEvent) -> IdentifyTraits {
     var context = Context()
     let contextDict = event.context?.rawDictionary ?? [:]
 
@@ -145,7 +145,7 @@ internal func toIdentifyTraits(from event: IdentifyEvent) -> IdentifyTraits {
  *   - previousTraits: The previous traits to compare against
  * - Returns: The new traits object with de-duped values
  */
-internal func deDupe(currentTraits: IdentifyTraits, previousTraits: IdentifyTraits?) -> IdentifyTraits {
+func deDupe(currentTraits: IdentifyTraits, previousTraits: IdentifyTraits?) -> IdentifyTraits {
     guard let previousTraits = previousTraits else {
         return currentTraits
     }
@@ -186,7 +186,7 @@ private func takeIfDifferent<T: Equatable>(_ new: T?, _ old: T?) -> T? {
 /**
  * Returns deduplicated custom traits by comparing new and old traits.
  */
-internal func getDeDupedCustomTraits(
+func getDeDupedCustomTraits(
     deDupeEnabled: Bool,
     newCustomTraits: [String: Any],
     oldCustomTraits: [String: Any]
@@ -236,7 +236,7 @@ private func areValuesEqual(_ value1: Any, _ value2: Any) -> Bool {
 }
 
 /// Centralized date formatters for consistent date handling across the integration.
-internal enum DateFormatters {
+enum DateFormatters {
 
     /// ISO8601 formatter with fractional seconds for custom attribute date parsing.
     /// Format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z' (e.g., 2024-01-15T10:30:45.123Z)
