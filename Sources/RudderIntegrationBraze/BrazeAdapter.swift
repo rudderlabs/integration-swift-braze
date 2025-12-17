@@ -75,7 +75,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     func addUserAlias(_ alias: String, label: String) {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot add user alias.")
             return
         }
@@ -84,7 +84,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     func changeUser(userId: String) {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot change user.")
             return
         }
@@ -147,7 +147,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     private func setCustomAttribute(key: String, value: Any) {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot set custom attribute.")
             return
         }
@@ -182,7 +182,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     func setUserAttribute(_ attribute: BrazeUserAttribute) {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot set user attribute.")
             return
         }
@@ -210,7 +210,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     func logPurchase(productId: String, currency: String, price: Double, quantity: Int, properties: [String: Any]?) {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot log purchase.")
             return
         }
@@ -225,7 +225,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     func logCustomEvent(name: String, properties: [String: Any]?) {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot log custom event.")
             return
         }
@@ -240,7 +240,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     func requestImmediateDataFlush() {
-        guard let braze = braze else {
+        guard let braze else {
             LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot flush data.")
             return
         }
