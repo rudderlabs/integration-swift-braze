@@ -11,7 +11,7 @@ import BrazeKit
 import RudderStackAnalytics
 
 protocol BrazeAdapter {
-    func initSDK(apiKey: String, endpoint: String, logLevel: LogLevel) -> Bool
+    func initSDK(appIdentifierKey: String, endpoint: String, logLevel: LogLevel) -> Bool
     func addUserAlias(_ alias: String, label: String)
     func changeUser(userId: String)
     func setTraits(deDupedTraits: IdentifyTraits)
@@ -43,10 +43,10 @@ class DefaultBrazeAdapter: BrazeAdapter {
 
     init() {}
 
-    func initSDK(apiKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
+    func initSDK(appIdentifierKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
         guard braze == nil else { return true }
 
-        let configuration = Braze.Configuration(apiKey: apiKey, endpoint: endpoint)
+        let configuration = Braze.Configuration(apiKey: appIdentifierKey, endpoint: endpoint)
         setLogLevel(rudderLogLevel: logLevel, brazeConfiguration: configuration)
 
         let braze = Braze(configuration: configuration)

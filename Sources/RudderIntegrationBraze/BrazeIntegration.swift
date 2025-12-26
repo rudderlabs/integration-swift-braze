@@ -65,7 +65,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         if let config: RudderBrazeConfig = parse(destinationConfig) {
             self.brazeConfig = config
             let success = brazeAdapter.initSDK(
-                apiKey: config.resolvedApiKey,
+                appIdentifierKey: config.resolvedAppIdentifierKey,
                 endpoint: config.customEndpoint,
                 logLevel: LoggerAnalytics.logLevel
             )
