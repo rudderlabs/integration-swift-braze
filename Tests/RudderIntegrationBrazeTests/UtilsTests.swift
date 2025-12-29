@@ -73,7 +73,7 @@ struct UtilsTests {
         let result: RudderBrazeConfig? = parse(config)
 
         #expect(result != nil)
-        #expect(result?.resolvedApiKey == "test-api-key-123")
+        #expect(result?.resolvedAppIdentifierKey == "test-api-key-123")
         #expect(result?.supportDedup == true)
     }
 
