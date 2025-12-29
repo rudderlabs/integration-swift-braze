@@ -14,58 +14,59 @@ private let brazeExternalIdKey = "brazeExternalId"
  * Structure representing the configuration for Braze Integration.
  *
  * - Parameters:
- *   - appIdentifierKey: The App Identifier Key for Braze (serialized as "appKey" for backward compatibility).
+ *   - apiKey: The API key for Braze (serialized as "appKey" for backward compatibility).
  *             Used as fallback when platform-specific keys are not configured.
- *   - iOSAppIdentifierKey: The iOS-specific App Identifier Key for Braze. Takes precedence when usePlatformSpecificAppIdentifierKeys is true.
- *   - usePlatformSpecificAppIdentifierKeys: Flag to enable platform-specific App Identifier Key resolution.
+ *   - iOSApiKey: The iOS-specific API key for Braze. Takes precedence when usePlatformSpecificApiKeys is true.
+ *   - usePlatformSpecificApiKeys: Flag to enable platform-specific API key resolution.
  *   - customEndpoint: The custom endpoint for the data center. Must not be empty or blank.
  *   - supportDedup: Flag indicating whether deduplication is supported.
  *   - connectionMode: The mode of connection, either hybrid or device.
  *
- * - Throws: DecodingError if resolved appIdentifierKey or customEndpoint is invalid.
+ * - Throws: DecodingError if resolved apiKey or customEndpoint is invalid.
  */
 struct RudderBrazeConfig: Codable {
 
-    let appIdentifierKey: String
-    let iOSAppIdentifierKey: String?
-    let usePlatformSpecificAppIdentifierKeys: Bool
+    let apiKey: String
+    let iOSApiKey: String?
+    let usePlatformSpecificApiKeys: Bool
     let customEndpoint: String
     let supportDedup: Bool
     let connectionMode: ConnectionMode
 
     enum CodingKeys: String, CodingKey {
-        case appIdentifierKey = "appKey"
-        case iOSAppIdentifierKey = "iOSApiKey"
-        case usePlatformSpecificAppIdentifierKeys = "usePlatformSpecificApiKeys"
+        // We cannot change the legacy "appKey" field to "apiKey".
+        case apiKey = "appKey"
+        case iOSApiKey
+        case usePlatformSpecificApiKeys
         case customEndpoint = "dataCenter"
         case supportDedup
         case connectionMode
     }
 
     /**
-     * Resolves the App Identifier Key to use based on platform-specific configuration.
-     * Prefers iOSAppIdentifierKey when usePlatformSpecificAppIdentifierKeys is enabled and iOSAppIdentifierKey is not blank.
-     * Falls back to the default appIdentifierKey otherwise.
+     * Resolves the API key to use based on platform-specific configuration.
+     * Prefers iOSApiKey when usePlatformSpecificApiKeys is enabled and iOSApiKey is not blank.
+     * Falls back to the legacy apiKey otherwise.
      */
-    var resolvedAppIdentifierKey: String {
-        if usePlatformSpecificAppIdentifierKeys {
-            if let iosKey = iOSAppIdentifierKey, !iosKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+    var resolvedApiKey: String {
+        if usePlatformSpecificApiKeys {
+            if let iosKey = iOSApiKey, !iosKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return iosKey
             } else {
-                LoggerAnalytics.error("BrazeIntegration: Configured to use platform-specific App Identifier Keys but iOS App Identifier Key is not valid. Falling back to the Default App Identifier Key.")
-                return appIdentifierKey
+                LoggerAnalytics.error("BrazeIntegration: Configured to use platform-specific API keys but iOS API key is not valid. Falling back to the default API key.")
+                return apiKey
             }
         } else {
-            return appIdentifierKey
+            return apiKey
         }
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        appIdentifierKey = try container.decode(String.self, forKey: .appIdentifierKey)
-        iOSAppIdentifierKey = try container.decodeIfPresent(String.self, forKey: .iOSAppIdentifierKey)
-        usePlatformSpecificAppIdentifierKeys = try container.decodeIfPresent(Bool.self, forKey: .usePlatformSpecificAppIdentifierKeys) ?? false
+        apiKey = try container.decode(String.self, forKey: .apiKey)
+        iOSApiKey = try container.decodeIfPresent(String.self, forKey: .iOSApiKey)
+        usePlatformSpecificApiKeys = try container.decodeIfPresent(Bool.self, forKey: .usePlatformSpecificApiKeys) ?? false
         supportDedup = try container.decode(Bool.self, forKey: .supportDedup)
         connectionMode = try container.decode(ConnectionMode.self, forKey: .connectionMode)
 
@@ -74,11 +75,11 @@ struct RudderBrazeConfig: Codable {
         customEndpoint = try CustomEndpointDecoder.decode(dataCenterString)
 
         // Validation
-        guard !resolvedAppIdentifierKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !resolvedApiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw DecodingError.dataCorruptedError(
-                forKey: .appIdentifierKey,
+                forKey: .apiKey,
                 in: container,
-                debugDescription: "Invalid App Identifier Key. Aborting Braze initialization."
+                debugDescription: "Invalid API key. Aborting Braze initialization."
             )
         }
 
