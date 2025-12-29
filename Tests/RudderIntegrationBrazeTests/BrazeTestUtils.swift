@@ -17,7 +17,7 @@ class MockBrazeAdapter: BrazeAdapter {
 
     // MARK: - Tracking Variables
     var isInitialized = false
-    var initSDKCalls: [(apiKey: String, endpoint: String, logLevel: LogLevel)] = []
+    var initSDKCalls: [(appIdentifierKey: String, endpoint: String, logLevel: LogLevel)] = []
     var changeUserCalls: [String] = []
     var addUserAliasCalls: [(alias: String, label: String)] = []
     var setUserAttributeCalls: [BrazeUserAttribute] = []
@@ -31,8 +31,8 @@ class MockBrazeAdapter: BrazeAdapter {
 
     // MARK: - BrazeAdapter Implementation
 
-    func initSDK(apiKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
-        initSDKCalls.append((apiKey: apiKey, endpoint: endpoint, logLevel: logLevel))
+    func initSDK(appIdentifierKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
+        initSDKCalls.append((appIdentifierKey: appIdentifierKey, endpoint: endpoint, logLevel: logLevel))
         if shouldFailInitialization {
             isInitialized = false
             return false
@@ -136,7 +136,7 @@ struct BrazeTestData {
         ]
     }
 
-    // MARK: - Platform-Specific API Key Test Configurations
+    // MARK: - Platform-Specific App Identifier Key Test Configurations
 
     static var configWithIosApiKey: [String: Any] {
         [
