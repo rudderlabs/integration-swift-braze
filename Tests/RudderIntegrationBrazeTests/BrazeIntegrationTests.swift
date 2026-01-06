@@ -95,7 +95,7 @@ class BrazeIntegrationTests {
         #expect(mockAdapter.initSDKCalls.count == 1) // Only from create call
     }
 
-    // MARK: - Platform-Specific API Key Tests
+    // MARK: - Platform-Specific App Identifier Key Tests
 
     @Test("given platform-specific key is enabled and iOSApiKey is present, when integration is initialized, then iOSApiKey should be used")
     func testPlatformSpecificKeyEnabledWithIosApiKey() throws {
@@ -103,7 +103,7 @@ class BrazeIntegrationTests {
 
         #expect(mockAdapter.initSDKCalls.count == 1)
         #expect(mockAdapter.isInitialized == true)
-        #expect(mockAdapter.initSDKCalls[0].apiKey == "iosSpecificApiKey")
+        #expect(mockAdapter.initSDKCalls[0].appIdentifierKey == "iosSpecificApiKey")
         #expect(mockAdapter.initSDKCalls[0].endpoint == "sdk.iad-03.braze.com")
     }
 
@@ -113,7 +113,7 @@ class BrazeIntegrationTests {
 
         #expect(mockAdapter.initSDKCalls.count == 1)
         #expect(mockAdapter.isInitialized == true)
-        #expect(mockAdapter.initSDKCalls[0].apiKey == "legacyAppKey")
+        #expect(mockAdapter.initSDKCalls[0].appIdentifierKey == "legacyAppKey")
         #expect(mockAdapter.initSDKCalls[0].endpoint == "sdk.iad-03.braze.com")
     }
 
@@ -123,7 +123,7 @@ class BrazeIntegrationTests {
 
         #expect(mockAdapter.initSDKCalls.count == 1)
         #expect(mockAdapter.isInitialized == true)
-        #expect(mockAdapter.initSDKCalls[0].apiKey == "legacyAppKey")
+        #expect(mockAdapter.initSDKCalls[0].appIdentifierKey == "legacyAppKey")
     }
 
     @Test("given platform-specific key is enabled but iosApiKey is missing, when integration is initialized, then legacy appKey should be used as fallback")
@@ -135,7 +135,7 @@ class BrazeIntegrationTests {
 
         #expect(mockAdapter.initSDKCalls.count == 1)
         #expect(mockAdapter.isInitialized == true)
-        #expect(mockAdapter.initSDKCalls[0].apiKey == "legacyAppKey")
+        #expect(mockAdapter.initSDKCalls[0].appIdentifierKey == "legacyAppKey")
     }
 
     // MARK: - Identify Event Tests - Device Mode
