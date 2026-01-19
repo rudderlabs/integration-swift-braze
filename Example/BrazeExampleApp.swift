@@ -59,7 +59,7 @@ extension AnalyticsManager {
         )
 
         let traits: [String: Any] = [
-            "email": "test.swift@integartion-test.com",
+            "email": "test.swift@integration-test.com",
             "firstName": "First Name",
             "lastName": "Last Name",
             "gender": "Male",
