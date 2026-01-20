@@ -17,7 +17,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static", .upToNextMajor(from: "12.0.0")),
+        .package(url: "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static", .upToNextMajor(from: "14.0.0")),
         .package(url: "https://github.com/rudderlabs/rudder-sdk-swift.git", .upToNextMajor(from: "1.0.0"))
     ],
     targets: [

@@ -55,11 +55,11 @@ extension AnalyticsManager {
 
     func identifyUser() {
         let options = RudderOption(
-            externalIds: [ExternalId(type: "brazeExternalId", id: "2d31d085-4d93-4126-b2b3-94e651810673")]
+            externalIds: [ExternalId(type: "brazeExternalId", id: "463f2b09-ab10-457d-9835-b840f9fdf63f")]
         )
 
         let traits: [String: Any] = [
-            "email": "test@gmail.com",
+            "email": "test.swift@integration-test.com",
             "firstName": "First Name",
             "lastName": "Last Name",
             "gender": "Male",

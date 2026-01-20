@@ -1,13 +1,12 @@
 {
-  "originHash" : "8adf40b7bfe0f8be0007c3dfaa20de578719d5a6b0cea345b0272baa9169a1a6",
   "pins" : [
     {
       "identity" : "braze-swift-sdk-prebuilt-static",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static",
       "state" : {
-        "revision" : "8be16a8beed853741e4d98aa36ed6a3f94693137",
-        "version" : "12.1.0"
+        "revision" : "9029f34d023deac6039e3bafc6212af0bb92067d",
+        "version" : "14.0.1"
       }
     },
     {
@@ -20,5 +19,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
