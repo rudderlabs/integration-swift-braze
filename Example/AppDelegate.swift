@@ -40,6 +40,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AnalyticsManager.shared.analytics = analytics
 
         brazePlugin.onDestinationReady { instance, result in
+            guard case .success = result else {
+                LoggerAnalytics.debug("Braze destination not ready: \(result)")
+                return
+            }
             if let braze = instance as? Braze {
                 braze.inAppMessagePresenter = BrazeInAppMessageUI()
             }
@@ -50,8 +54,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let center = UNUserNotificationCenter.current()
         center.setNotificationCategories(Braze.Notifications.categories)
         center.delegate = self
-        center.requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
-        application.registerForRemoteNotifications()
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if let error {
+                LoggerAnalytics.debug("Push authorization error: \(error)")
+                return
+            }
+            guard granted else {
+                LoggerAnalytics.debug("Push authorization denied")
+                return
+            }
+            DispatchQueue.main.async {
+                application.registerForRemoteNotifications()
+            }
+        }
     }
 
     // MARK: - Remote Notification Registration
