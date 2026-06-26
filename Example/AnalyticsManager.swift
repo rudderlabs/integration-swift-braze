@@ -126,6 +126,147 @@ extension AnalyticsManager {
         LoggerAnalytics.debug("✅ Tracked Order Completed event with multiple products")
     }
 
+    // MARK: - Recommended Ecommerce Events
+
+    /*
+     * These RudderStack ecommerce track events map to Braze recommended `ecommerce.*`
+     * events only when `useEcommerceRecommendedEvents` is enabled on the Braze destination
+     * in the RudderStack dashboard. When the flag is off, they flow through the legacy /
+     * custom-event path instead. Properties use the RS ecommerce spec field names that the
+     * mappings consume; a few extra keys are included to demonstrate `metadata` routing.
+     */
+
+    func productViewed() {
+        let properties: [String: Any] = [
+            "product_id": "prod_001",
+            "name": "Air Jordan 1",
+            "variant": "red-42",
+            "price": 129.99,
+            "currency": "USD",
+            "image_url": "https://example.com/img/aj1.png",
+            "url": "https://example.com/products/aj1",
+            "type": ["sneakers", "limited-edition"],
+            "category": "footwear"
+        ]
+
+        analytics?.track(name: "Product Viewed", properties: properties)
+        LoggerAnalytics.debug("✅ Tracked Product Viewed event")
+    }
+
+    func productAdded() {
+        // For cart_updated, the top-level product fields are wrapped into a single product.
+        let properties: [String: Any] = [
+            "cart_id": "cart_123",
+            "currency": "USD",
+            "product_id": "prod_001",
+            "name": "Air Jordan 1",
+            "variant": "red-42",
+            "quantity": 1,
+            "price": 129.99,
+            "image_url": "https://example.com/img/aj1.png",
+            "url": "https://example.com/products/aj1"
+        ]
+
+        analytics?.track(name: "Product Added", properties: properties)
+        LoggerAnalytics.debug("✅ Tracked Product Added event (cart_updated, action: add)")
+    }
+
+    func productRemoved() {
+        let properties: [String: Any] = [
+            "cart_id": "cart_123",
+            "currency": "USD",
+            "product_id": "prod_001",
+            "name": "Air Jordan 1",
+            "variant": "red-42",
+            "quantity": 1,
+            "price": 129.99
+        ]
+
+        analytics?.track(name: "Product Removed", properties: properties)
+        LoggerAnalytics.debug("✅ Tracked Product Removed event (cart_updated, action: remove)")
+    }
+
+    func checkoutStarted() {
+        let properties: [String: Any] = [
+            "checkout_id": "chk_789",
+            "cart_id": "cart_123",
+            "total": 259.98,
+            "subtotal_value": 239.98,
+            "tax": 10.0,
+            "shipping": 10.0,
+            "currency": "USD",
+            "products": [
+                [
+                    "product_id": "prod_001",
+                    "name": "Air Jordan 1",
+                    "variant": "red-42",
+                    "quantity": 1,
+                    "price": 129.99
+                ],
+                [
+                    "product_id": "prod_002",
+                    "name": "Yeezy 350",
+                    "variant": "zebra-43",
+                    "quantity": 1,
+                    "price": 129.99
+                ]
+            ]
+        ]
+
+        analytics?.track(name: "Checkout Started", properties: properties)
+        LoggerAnalytics.debug("✅ Tracked Checkout Started event")
+    }
+
+    func orderRefunded() {
+        let properties: [String: Any] = [
+            "order_id": "order_456",
+            "total": 129.99,
+            "currency": "USD",
+            "total_discounts": 10.0,
+            "discounts": [
+                [
+                    "code": "SAVE10",
+                    "amount": 10.0
+                ]
+            ],
+            "products": [
+                [
+                    "product_id": "prod_001",
+                    "name": "Air Jordan 1",
+                    "variant": "red-42",
+                    "quantity": 1,
+                    "price": 129.99
+                ]
+            ]
+        ]
+
+        analytics?.track(name: "Order Refunded", properties: properties)
+        LoggerAnalytics.debug("✅ Tracked Order Refunded event")
+    }
+
+    func orderCancelled() {
+        let properties: [String: Any] = [
+            "order_id": "order_789",
+            "total": 129.99,
+            "currency": "USD",
+            "cancel_reason": "Customer changed their mind",
+            "tax": 5.0,
+            "shipping": 5.0,
+            "products": [
+                [
+                    "product_id": "prod_001",
+                    "name": "Air Jordan 1",
+                    "variant": "red-42",
+                    "quantity": 1,
+                    "price": 129.99
+                ]
+            ]
+        ]
+
+        analytics?.track(name: "Order Cancelled", properties: properties)
+        LoggerAnalytics.debug("✅ Tracked Order Cancelled event")
+    }
+
     // MARK: - Custom Track Events
 
     func customTrackEventWithProperties() {
