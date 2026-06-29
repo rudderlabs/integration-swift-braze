@@ -110,6 +110,15 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
     public func track(payload: TrackEvent) {
         if brazeConfig?.isHybridMode() == true { return }
 
+        // Recommended ecommerce events take precedence over the legacy path when opted in.
+        // For mapped events (incl. Order Completed → ecommerce.order_placed) this returns
+        // before the legacy switch; unmapped events fall through unchanged.
+        if brazeConfig?.useEcommerceRecommendedEvents == true,
+           let mapping = getEcommerceMapping(payload.event) {
+            handleRecommendedEcommerceEvent(payload: payload, mapping: mapping)
+            return
+        }
+
         switch payload.event {
         case installAttributed:
             handleInstallAttributedEvent(payload: payload)
@@ -120,6 +129,21 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         default:
             handleCustomEvent(payload: payload)
         }
+    }
+
+    /**
+     * Handles a RudderStack ecommerce event mapped to a Braze recommended `ecommerce.*` event.
+     * Builds the mapped properties (send-anyway: never throws or drops) and logs it as a
+     * custom event under the Braze recommended event name.
+     */
+    private func handleRecommendedEcommerceEvent(payload: TrackEvent, mapping: EcommerceEventMapping) {
+        let properties = payload.properties?.dictionary?.rawDictionary ?? [:]
+        let eventProperties = buildEcommerceEventProperties(
+            properties: properties,
+            brazeEvent: mapping.brazeEvent,
+            action: mapping.action
+        )
+        brazeAdapter.logCustomEvent(name: mapping.brazeEvent, properties: eventProperties)
     }
 
     /**

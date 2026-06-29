@@ -114,6 +114,28 @@ Replace:
 - `<WRITE_KEY>`: Your project's write key from the RudderStack dashboard
 - `<DATA_PLANE_URL>`: The URL of your RudderStack data plane
 
+## Recommended ecommerce events
+
+The integration can map supported RudderStack ecommerce `track` events to [Braze recommended ecommerce events](https://www.braze.com/docs/user_guide/data/activation/events/recommended_events) (`ecommerce.*`). This is opt-in via the `useEcommerceRecommendedEvents` destination flag (configured in the RudderStack dashboard) and defaults to **off** — when off, track handling is unchanged.
+
+When enabled, the following events are mapped:
+
+| RudderStack event | Braze event                  | action   |
+| ----------------- | ---------------------------- | -------- |
+| Product Viewed    | `ecommerce.product_viewed`   | —        |
+| Product Added     | `ecommerce.cart_updated`     | `add`    |
+| Product Removed   | `ecommerce.cart_updated`     | `remove` |
+| Checkout Started  | `ecommerce.checkout_started` | —        |
+| Order Completed   | `ecommerce.order_placed`     | —        |
+| Order Refunded    | `ecommerce.order_refunded`   | —        |
+| Order Cancelled   | `ecommerce.order_cancelled`  | —        |
+
+Notes:
+
+- Event names match case-insensitively after trimming. `Cart Viewed` and `Cart Updated` are not mapped and fall through to the generic custom-event path.
+- With the flag on, `Order Completed` emits `ecommerce.order_placed` instead of the legacy purchase call.
+- The mapping never drops or rejects an event: values are coerced to Braze's expected type where the conversion is lossless, unmapped properties are preserved under `metadata`, and missing required fields or type mismatches are surfaced as warnings while the event is still sent.
+
 ---
 
 ## Contact us

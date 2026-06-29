@@ -120,6 +120,26 @@ struct BrazeTestData {
         ]
     }
 
+    static var configWithRecommendedEvents: [String: Any] {
+        [
+            "appKey": "test-api-key-123",
+            "dataCenter": "US-01",
+            "supportDedup": false,
+            "connectionMode": "device",
+            "useEcommerceRecommendedEvents": true
+        ]
+    }
+
+    static var hybridConfigWithRecommendedEvents: [String: Any] {
+        [
+            "appKey": "test-api-key-123",
+            "dataCenter": "US-01",
+            "supportDedup": false,
+            "connectionMode": "hybrid",
+            "useEcommerceRecommendedEvents": true
+        ]
+    }
+
     static var invalidConfig: [String: Any] {
         [
             "dataCenter": "US-01",
