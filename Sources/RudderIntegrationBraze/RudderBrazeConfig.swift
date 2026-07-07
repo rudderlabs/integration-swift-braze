@@ -21,6 +21,9 @@ private let brazeExternalIdKey = "brazeExternalId"
  *   - customEndpoint: The custom endpoint for the data center. Must not be empty or blank.
  *   - supportDedup: Flag indicating whether deduplication is supported.
  *   - connectionMode: The mode of connection, either hybrid or device.
+ *   - useEcommerceRecommendedEvents: Opt-in flag (default false) to map supported RudderStack
+ *             ecommerce track events to Braze recommended `ecommerce.*` events. When off,
+ *             track handling is unchanged.
  *
  * - Throws: DecodingError if resolved appIdentifierKey or customEndpoint is invalid.
  */
@@ -32,6 +35,7 @@ struct RudderBrazeConfig: Codable {
     let customEndpoint: String
     let supportDedup: Bool
     let connectionMode: ConnectionMode
+    let useEcommerceRecommendedEvents: Bool
 
     enum CodingKeys: String, CodingKey {
         case appIdentifierKey = "appKey"
@@ -40,6 +44,7 @@ struct RudderBrazeConfig: Codable {
         case customEndpoint = "dataCenter"
         case supportDedup
         case connectionMode
+        case useEcommerceRecommendedEvents
     }
 
     /**
@@ -68,6 +73,7 @@ struct RudderBrazeConfig: Codable {
         usePlatformSpecificAppIdentifierKeys = try container.decodeIfPresent(Bool.self, forKey: .usePlatformSpecificAppIdentifierKeys) ?? false
         supportDedup = try container.decode(Bool.self, forKey: .supportDedup)
         connectionMode = try container.decode(ConnectionMode.self, forKey: .connectionMode)
+        useEcommerceRecommendedEvents = try container.decodeIfPresent(Bool.self, forKey: .useEcommerceRecommendedEvents) ?? false
 
         // Custom decoding for customEndpoint with data center mapping
         let dataCenterString = try container.decode(String.self, forKey: .customEndpoint)

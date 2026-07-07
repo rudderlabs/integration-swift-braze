@@ -35,6 +35,9 @@ struct ContentView: View {
                     // Order Completed Events
                     orderCompletedEventsSection
 
+                    // Recommended Ecommerce Events
+                    recommendedEcommerceEventsSection
+
                     // Custom Track Events
                     customTrackEventsSection
 
@@ -97,6 +100,51 @@ extension ContentView {
         }
         .padding()
         .background(Color.green.opacity(0.1))
+        .cornerRadius(10)
+    }
+
+    var recommendedEcommerceEventsSection: some View {
+        VStack(spacing: 12) {
+            Text("Recommended Ecommerce Events")
+                .font(.headline)
+
+            Text("Requires useEcommerceRecommendedEvents enabled on the Braze destination. Order Completed (above) maps to ecommerce.order_placed.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            Button("Product Viewed") {
+                analyticsManager.productViewed()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button("Product Added") {
+                analyticsManager.productAdded()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button("Product Removed") {
+                analyticsManager.productRemoved()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button("Checkout Started") {
+                analyticsManager.checkoutStarted()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button("Order Refunded") {
+                analyticsManager.orderRefunded()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+
+            Button("Order Cancelled") {
+                analyticsManager.orderCancelled()
+            }
+            .buttonStyle(SecondaryButtonStyle())
+        }
+        .padding()
+        .background(Color.pink.opacity(0.1))
         .cornerRadius(10)
     }
 

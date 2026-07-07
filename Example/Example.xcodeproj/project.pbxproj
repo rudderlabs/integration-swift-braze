@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		53E58C222F9F3C57002556B9 /* BrazeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 53E58C212F9F3C57002556B9 /* BrazeUI */; };
+		53E58C242F9F7B15002556B9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E58C232F9F7B15002556B9 /* AppDelegate.swift */; };
+		53E58C262F9F7BA3002556B9 /* AnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E58C252F9F7BA3002556B9 /* AnalyticsManager.swift */; };
 		85025B862ED08895006BA318 /* RudderIntegrationBraze in Frameworks */ = {isa = PBXBuildFile; productRef = 85025B852ED08895006BA318 /* RudderIntegrationBraze */; };
 		85BCB07A2ED086E400F70A05 /* BrazeExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BCB0792ED086E400F70A05 /* BrazeExampleApp.swift */; };
 		85BCB07C2ED086E400F70A05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BCB07B2ED086E400F70A05 /* ContentView.swift */; };
@@ -14,6 +17,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		53E58C232F9F7B15002556B9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		53E58C252F9F7BA3002556B9 /* AnalyticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsManager.swift; sourceTree = "<group>"; };
+		53FBEB692F9B500F0072557F /* Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example.entitlements; sourceTree = "<group>"; };
 		85BCB0762ED086E400F70A05 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85BCB0792ED086E400F70A05 /* BrazeExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrazeExampleApp.swift; sourceTree = "<group>"; };
 		85BCB07B2ED086E400F70A05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -26,6 +32,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				85025B862ED08895006BA318 /* RudderIntegrationBraze in Frameworks */,
+				53E58C222F9F3C57002556B9 /* BrazeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -35,6 +42,9 @@
 		85BCB06D2ED086E400F70A05 = {
 			isa = PBXGroup;
 			children = (
+				53E58C252F9F7BA3002556B9 /* AnalyticsManager.swift */,
+				53E58C232F9F7B15002556B9 /* AppDelegate.swift */,
+				53FBEB692F9B500F0072557F /* Example.entitlements */,
 				85BCB0772ED086E400F70A05 /* Products */,
 				85BCB07D2ED086E600F70A05 /* Assets.xcassets */,
 				85BCB0792ED086E400F70A05 /* BrazeExampleApp.swift */,
@@ -68,6 +78,7 @@
 			name = Example;
 			packageProductDependencies = (
 				85025B852ED08895006BA318 /* RudderIntegrationBraze */,
+				53E58C212F9F3C57002556B9 /* BrazeUI */,
 			);
 			productName = BrazeExample;
 			productReference = 85BCB0762ED086E400F70A05 /* Example.app */;
@@ -99,6 +110,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				85025B842ED08895006BA318 /* XCLocalSwiftPackageReference "../../integration-swift-braze" */,
+				53E58C202F9F3C57002556B9 /* XCRemoteSwiftPackageReference "braze-swift-sdk-prebuilt-static" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 85BCB0772ED086E400F70A05 /* Products */;
@@ -126,6 +138,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53E58C262F9F7BA3002556B9 /* AnalyticsManager.swift in Sources */,
+				53E58C242F9F7B15002556B9 /* AppDelegate.swift in Sources */,
 				85BCB07C2ED086E400F70A05 /* ContentView.swift in Sources */,
 				85BCB07A2ED086E400F70A05 /* BrazeExampleApp.swift in Sources */,
 			);
@@ -255,6 +269,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Example.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UCL2K3J73M;
@@ -278,7 +293,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rudderstack.BrazeExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rudderstack.integration.test.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -300,6 +315,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Example.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UCL2K3J73M;
@@ -323,7 +339,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rudderstack.BrazeExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rudderstack.integration.test.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -370,7 +386,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		53E58C202F9F3C57002556B9 /* XCRemoteSwiftPackageReference "braze-swift-sdk-prebuilt-static" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		53E58C212F9F3C57002556B9 /* BrazeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 53E58C202F9F3C57002556B9 /* XCRemoteSwiftPackageReference "braze-swift-sdk-prebuilt-static" */;
+			productName = BrazeUI;
+		};
 		85025B852ED08895006BA318 /* RudderIntegrationBraze */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RudderIntegrationBraze;
