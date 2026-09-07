@@ -109,7 +109,7 @@
 			mainGroup = 85BCB06D2ED086E400F70A05;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				85025B842ED08895006BA318 /* XCLocalSwiftPackageReference "../../integration-swift-braze" */,
+				85025B842ED08895006BA318 /* XCLocalSwiftPackageReference ".." */,
 				53E58C202F9F3C57002556B9 /* XCRemoteSwiftPackageReference "braze-swift-sdk-prebuilt-static" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -380,9 +380,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		85025B842ED08895006BA318 /* XCLocalSwiftPackageReference "../../integration-swift-braze" */ = {
+		85025B842ED08895006BA318 /* XCLocalSwiftPackageReference ".." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../integration-swift-braze";
+			relativePath = ..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
