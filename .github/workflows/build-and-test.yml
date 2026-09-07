@@ -23,6 +23,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+        with:
+          persist-credentials: false
       - name: Show toolchain
         run: xcodebuild -version
       - name: Run package tests
@@ -68,6 +70,8 @@ jobs:
             destination: generic/platform=iOS Simulator
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+        with:
+          persist-credentials: false
       - name: Show toolchain
         run: xcodebuild -version
       - name: Build
