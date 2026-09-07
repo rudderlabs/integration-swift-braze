@@ -19,7 +19,7 @@ env:
 jobs:
   tests:
     name: iOS ${{ matrix.suite }} tests
-    runs-on: macos-15
+    runs-on: macos-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -65,7 +65,7 @@ jobs:
 
   builds:
     name: Build ${{ matrix.target }}
-    runs-on: macos-15
+    runs-on: macos-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false

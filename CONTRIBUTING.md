@@ -36,7 +36,7 @@ For any questions, concerns, or queries, you can start by asking a question in o
 
 ## Validation
 
-CI uses macOS 15 and Xcode 26.2. Select that installation before running the
+CI uses `macos-latest` and Xcode 26.2. Select that Xcode installation before running the
 same commands locally:
 
 ```sh
