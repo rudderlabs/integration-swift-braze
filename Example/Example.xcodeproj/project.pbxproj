@@ -392,7 +392,7 @@
 			repositoryURL = "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 14.1.0;
+				minimumVersion = 18.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
