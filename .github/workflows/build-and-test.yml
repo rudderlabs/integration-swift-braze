@@ -1,0 +1,96 @@
+name: Build and test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+
+jobs:
+  tests:
+    name: iOS package tests
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Show toolchain
+        run: xcodebuild -version
+      - name: Run package tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p test-results
+          device_id=$(xcrun simctl list devices available --json | jq -er '
+            [.devices | to_entries[]
+              | select(.key | contains("iOS-26-2"))
+              | .value[] | select(.name | startswith("iPhone"))][0].udid')
+          xcodebuild test \
+            -scheme RudderIntegrationBraze \
+            -destination "platform=iOS Simulator,id=$device_id" \
+            -derivedDataPath DerivedData/tests \
+            -resultBundlePath test-results/package.xcresult \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee test-results/xcodebuild.log
+          xcrun xcresulttool get test-results summary \
+            --path test-results/package.xcresult > test-results/summary.json
+          jq -e '.totalTestCount > 0 and .passedTests > 0 and .failedTests == 0' test-results/summary.json
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-test-results
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+  builds:
+    name: Build ${{ matrix.target }}
+    runs-on: macos-15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: ios
+            destination: generic/platform=iOS
+          - target: tvos
+            destination: generic/platform=tvOS
+          - target: example
+            destination: generic/platform=iOS Simulator
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - name: Show toolchain
+        run: xcodebuild -version
+      - name: Build
+        shell: bash
+        env:
+          BUILD_TARGET: ${{ matrix.target }}
+          DESTINATION: ${{ matrix.destination }}
+        run: |
+          set -euo pipefail
+          mkdir -p build-results
+          args=(-scheme RudderIntegrationBraze)
+          if [[ "$BUILD_TARGET" == example ]]; then
+            args=(-project Example/Example.xcodeproj -scheme Example)
+          fi
+          xcodebuild build "${args[@]}" \
+            -destination "$DESTINATION" \
+            -derivedDataPath DerivedData/build \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee build-results/xcodebuild.log
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-${{ matrix.target }}
+          path: build-results/
+          if-no-files-found: warn
+          retention-days: 14

@@ -33,3 +33,53 @@ For any questions, concerns, or queries, you can start by asking a question in o
 <!----variables---->
 
 [CLA]: https://rudderlabs.wufoo.com/forms/rudderlabs-contributor-license-agreement
+
+## Validation
+
+CI uses macOS 15 and Xcode 26.2. Select that installation before running the
+same commands locally:
+
+```sh
+export DEVELOPER_DIR=/Applications/Xcode_26.2.app/Contents/Developer
+xcodebuild -version
+```
+
+Run package tests on an available iOS simulator:
+
+```sh
+xcrun simctl list devices available
+xcodebuild test -scheme RudderIntegrationBraze \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+  -derivedDataPath DerivedData/tests \
+  -resultBundlePath /tmp/braze-package-tests.xcresult \
+  CODE_SIGNING_ALLOWED=NO
+xcrun xcresulttool get test-results summary \
+  --path /tmp/braze-package-tests.xcresult
+```
+
+Use an unused result-bundle path for each run. CI requires a nonzero test
+count and no failures. Tests use a mock Braze adapter and placeholder
+configuration; no customer credentials or live campaign are required.
+Passing these tests does not prove native Braze SDK behavior.
+
+Build both supported platforms and the Example:
+
+```sh
+xcodebuild build -scheme RudderIntegrationBraze \
+  -destination 'generic/platform=iOS' \
+  -derivedDataPath DerivedData/ios CODE_SIGNING_ALLOWED=NO
+xcodebuild build -scheme RudderIntegrationBraze \
+  -destination 'generic/platform=tvOS' \
+  -derivedDataPath DerivedData/tvos CODE_SIGNING_ALLOWED=NO
+xcodebuild build -project Example/Example.xcodeproj -scheme Example \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath DerivedData/example CODE_SIGNING_ALLOWED=NO
+```
+
+Install the iOS and tvOS platform components in Xcode before building.
+The Example references the package in this checkout, independent of its
+folder name. CI builds the Example but does not launch it.
+
+The workflow uploads build logs and the test result bundle for 14 days,
+including failed runs. Dependency requirements remain in `Package.swift`;
+this CI baseline does not change the Braze 14 requirement.
