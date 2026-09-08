@@ -45,7 +45,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return
             }
             if let braze = instance as? Braze {
-                braze.inAppMessagePresenter = BrazeInAppMessageUI()
+                DispatchQueue.main.async {
+                    braze.inAppMessagePresenter = BrazeInAppMessageUI()
+                    AnalyticsManager.shared.braze = braze
+                }
             }
         }
     }

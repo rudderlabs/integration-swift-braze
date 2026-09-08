@@ -18,9 +18,13 @@ env:
 
 jobs:
   tests:
-    name: iOS package tests
+    name: iOS ${{ matrix.suite }} tests
     runs-on: macos-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [package, native]
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -34,6 +38,8 @@ jobs:
         run: xcodebuild -version
       - name: Run package tests
         shell: bash
+        env:
+          TEST_SUITE: ${{ matrix.suite }}
         run: |
           set -euo pipefail
           mkdir -p test-results
@@ -41,8 +47,11 @@ jobs:
             [.devices | to_entries[]
               | select(.key | contains("iOS-26-2"))
               | .value[] | select(.name | startswith("iPhone"))][0].udid')
-          xcodebuild test \
-            -scheme RudderIntegrationBraze \
+          args=(-scheme RudderIntegrationBraze)
+          if [[ "$TEST_SUITE" == native ]]; then
+            args=(-project NativeTests/NativeTests.xcodeproj -scheme NativeBrazeTests)
+          fi
+          xcodebuild test "${args[@]}" \
             -destination "platform=iOS Simulator,id=$device_id" \
             -derivedDataPath DerivedData/tests \
             -resultBundlePath test-results/package.xcresult \
@@ -54,7 +63,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ios-test-results
+          name: ios-${{ matrix.suite }}-test-results
           path: test-results/
           if-no-files-found: warn
           retention-days: 14

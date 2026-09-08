@@ -24,7 +24,11 @@ class BrazeIntegrationTests {
         self.brazeIntegration = BrazeIntegration(brazeAdapter: mockAdapter)
 
         // Create mock analytics instance
-        let config = Configuration(writeKey: "test-write-key", dataPlaneUrl: "https://test.rudderstack.com")
+        let config = Configuration(
+            writeKey: "sdk-5275-\(UUID().uuidString)",
+            dataPlaneUrl: "https://data.invalid",
+            controlPlaneUrl: "https://config.invalid"
+        )
         self.mockAnalytics = Analytics(configuration: config)
 
         // Set analytics on integration (most tests need this)
@@ -38,6 +42,7 @@ class BrazeIntegrationTests {
         LoggerAnalytics.info("BrazeIntegrationTests: Tearing down test environment")
 
         // Clean up test objects
+        self.mockAnalytics.shutdown()
         self.mockAdapter = nil
         self.brazeIntegration = nil
         self.mockAnalytics = nil
@@ -66,6 +71,36 @@ class BrazeIntegrationTests {
     }
 
     // MARK: - Create/Setup Tests
+
+    @Test("initialization adds the anonymous alias with the existing label")
+    func testInitializationAlias() throws {
+        try setupWithDefaultConfig()
+        #expect(mockAdapter.addUserAliasCalls.count == 1)
+        #expect(mockAdapter.addUserAliasCalls.first?.alias == mockAnalytics.anonymousId)
+        #expect(mockAdapter.addUserAliasCalls.first?.label == "rudder_id")
+    }
+
+    @Test("failed initialization does not add an alias")
+    func testFailedInitializationDoesNotAlias() throws {
+        mockAdapter.shouldFailInitialization = true
+        try setupWithDefaultConfig()
+        #expect(mockAdapter.addUserAliasCalls.isEmpty)
+    }
+
+    @Test("identify and immediate events preserve invocation order across users")
+    func testImmediateIdentifyAndEventOrder() throws {
+        try setupWithDefaultConfig()
+        for user in ["user-a", "user-b"] {
+            brazeIntegration.identify(payload: BrazeTestData.createIdentifyEvent(
+                userId: user, traits: ["firstName": user]
+            ))
+            brazeIntegration.track(payload: BrazeTestData.createTrackEvent(name: user))
+        }
+        #expect(mockAdapter.callOrder == [
+            "changeUser:user-a", "setTraits", "event:user-a",
+            "changeUser:user-b", "setTraits", "event:user-b"
+        ])
+    }
 
     @Test("given successfully initialized integration, when getDestinationInstance is called, then returns instance")
     func testGetDestinationInstanceWhenInitialized() throws {
@@ -557,4 +592,3 @@ class BrazeIntegrationTests {
         #expect(freshAdapter.addUserAliasCalls.count == 0) // No alias set without analytics
     }
 }
-

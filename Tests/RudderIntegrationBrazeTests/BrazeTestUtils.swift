@@ -17,6 +17,7 @@ class MockBrazeAdapter: BrazeAdapter {
 
     // MARK: - Tracking Variables
     var isInitialized = false
+    var callOrder: [String] = []
     var initSDKCalls: [(appIdentifierKey: String, endpoint: String, logLevel: LogLevel)] = []
     var changeUserCalls: [String] = []
     var addUserAliasCalls: [(alias: String, label: String)] = []
@@ -42,6 +43,7 @@ class MockBrazeAdapter: BrazeAdapter {
     }
 
     func changeUser(userId: String) {
+        callOrder.append("changeUser:\(userId)")
         changeUserCalls.append(userId)
     }
 
@@ -54,10 +56,12 @@ class MockBrazeAdapter: BrazeAdapter {
     }
 
     func setTraits(deDupedTraits: IdentifyTraits) {
+        callOrder.append("setTraits")
         setTraitsCalls.append(deDupedTraits)
     }
 
     func logCustomEvent(name: String, properties: [String: Any]?) {
+        callOrder.append("event:\(name)")
         logCustomEventCalls.append((name: name, properties: properties))
     }
 
@@ -76,6 +80,7 @@ class MockBrazeAdapter: BrazeAdapter {
     // MARK: - Helper Methods
 
     func reset() {
+        callOrder.removeAll()
         isInitialized = false
         initSDKCalls.removeAll()
         changeUserCalls.removeAll()

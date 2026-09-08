@@ -74,8 +74,10 @@ let package = Package(
 This integration supports Braze iOS SDK version:
 
 ```
-12.0.0+
+>=18.2.0, <19.0.0
 ```
+
+Use Xcode 26 or later. See [Migrating to 2.0.0](MIGRATION.md) before upgrading from 1.x.
 
 ### Platform Support
 

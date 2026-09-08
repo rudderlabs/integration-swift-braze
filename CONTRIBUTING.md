@@ -81,5 +81,30 @@ The Example references the package in this checkout, independent of its
 folder name. CI builds the Example but does not launch it.
 
 The workflow uploads build logs and the test result bundle for 14 days,
-including failed runs. Dependency requirements remain in `Package.swift`;
-this CI baseline does not change the Braze 14 requirement.
+including failed runs. Dependency requirements are defined in `Package.swift`.
+
+### Native compatibility tests
+
+`NativeTests` provides an empty application host because Braze accesses
+notification APIs that cannot run in a hostless package-test process.
+It checks real-SDK request serialization for immediate user switches, traits,
+events, purchases, aliases, and flush. A separate Objective-C test compiles
+and calls the public wrapper. CI runs this suite independently of mock tests.
+
+```sh
+xcodebuild test -project NativeTests/NativeTests.xcodeproj \
+  -scheme NativeBrazeTests \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+  -derivedDataPath DerivedData/native \
+  -resultBundlePath /tmp/braze-native-tests.xcresult CODE_SIGNING_ALLOWED=NO
+```
+
+The native test uses a generated dummy key and a reserved `.invalid`
+endpoint. Expected DNS failures do not establish delivery success.
+Assertions inspect JSON from the SDK's request logger. They can require
+updates if a future SDK changes its diagnostic format.
+
+For live Banner checks, configure the Example for an isolated test source,
+identify an eligible test user, and enter the campaign placement in the
+Banner panel. The panel starts with an empty placement and does not load
+a campaign automatically. Never commit customer credentials.
