@@ -14,6 +14,8 @@
 		85BCB07A2ED086E400F70A05 /* BrazeExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BCB0792ED086E400F70A05 /* BrazeExampleApp.swift */; };
 		85BCB07C2ED086E400F70A05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BCB07B2ED086E400F70A05 /* ContentView.swift */; };
 		85BCB07E2ED086E600F70A05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85BCB07D2ED086E600F70A05 /* Assets.xcassets */; };
+		22CBCCE17EC74A03A909A9BB /* BannerVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47168ADE64514DC386311E37 /* BannerVerificationView.swift */; };
+		84BC4F88DD2741E49F505CE9 /* VerificationBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008F3644C4494A618221EFA7 /* VerificationBannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		85BCB0792ED086E400F70A05 /* BrazeExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrazeExampleApp.swift; sourceTree = "<group>"; };
 		85BCB07B2ED086E400F70A05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		85BCB07D2ED086E600F70A05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		47168ADE64514DC386311E37 /* BannerVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerVerificationView.swift; sourceTree = "<group>"; };
+		008F3644C4494A618221EFA7 /* VerificationBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationBannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +53,8 @@
 				85BCB07D2ED086E600F70A05 /* Assets.xcassets */,
 				85BCB0792ED086E400F70A05 /* BrazeExampleApp.swift */,
 				85BCB07B2ED086E400F70A05 /* ContentView.swift */,
+				008F3644C4494A618221EFA7 /* VerificationBannerView.swift */,
+				47168ADE64514DC386311E37 /* BannerVerificationView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -141,6 +147,8 @@
 				53E58C262F9F7BA3002556B9 /* AnalyticsManager.swift in Sources */,
 				53E58C242F9F7B15002556B9 /* AppDelegate.swift in Sources */,
 				85BCB07C2ED086E400F70A05 /* ContentView.swift in Sources */,
+				84BC4F88DD2741E49F505CE9 /* VerificationBannerView.swift in Sources */,
+				22CBCCE17EC74A03A909A9BB /* BannerVerificationView.swift in Sources */,
 				85BCB07A2ED086E400F70A05 /* BrazeExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
