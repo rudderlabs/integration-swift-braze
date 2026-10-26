@@ -33,3 +33,78 @@ For any questions, concerns, or queries, you can start by asking a question in o
 <!----variables---->
 
 [CLA]: https://rudderlabs.wufoo.com/forms/rudderlabs-contributor-license-agreement
+
+## Validation
+
+CI uses `macos-latest` and Xcode 26.2. Select that Xcode installation before running the
+same commands locally:
+
+```sh
+export DEVELOPER_DIR=/Applications/Xcode_26.2.app/Contents/Developer
+xcodebuild -version
+```
+
+Run package tests on an available iOS simulator:
+
+```sh
+xcrun simctl list devices available
+xcodebuild test -scheme RudderIntegrationBraze \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+  -derivedDataPath DerivedData/tests \
+  -resultBundlePath /tmp/braze-package-tests.xcresult \
+  CODE_SIGNING_ALLOWED=NO
+xcrun xcresulttool get test-results summary \
+  --path /tmp/braze-package-tests.xcresult
+```
+
+Use an unused result-bundle path for each run. CI requires a nonzero test
+count and no failures. Tests use a mock Braze adapter and placeholder
+configuration; no customer credentials or live campaign are required.
+Passing these tests does not prove native Braze SDK behavior.
+
+Build both supported platforms and the Example:
+
+```sh
+xcodebuild build -scheme RudderIntegrationBraze \
+  -destination 'generic/platform=iOS' \
+  -derivedDataPath DerivedData/ios CODE_SIGNING_ALLOWED=NO
+xcodebuild build -scheme RudderIntegrationBraze \
+  -destination 'generic/platform=tvOS' \
+  -derivedDataPath DerivedData/tvos CODE_SIGNING_ALLOWED=NO
+xcodebuild build -project Example/Example.xcodeproj -scheme Example \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath DerivedData/example CODE_SIGNING_ALLOWED=NO
+```
+
+Install the iOS and tvOS platform components in Xcode before building.
+The Example references the package in this checkout, independent of its
+folder name. CI builds the Example but does not launch it.
+
+The workflow uploads build logs and the test result bundle for 14 days,
+including failed runs. Dependency requirements are defined in `Package.swift`.
+
+### Native compatibility tests
+
+`NativeTests` provides an empty application host because Braze accesses
+notification APIs that cannot run in a hostless package-test process.
+It checks real-SDK request serialization for immediate user switches, traits,
+events, purchases, aliases, and flush. A separate Objective-C test compiles
+and calls the public wrapper. CI runs this suite independently of mock tests.
+
+```sh
+xcodebuild test -project NativeTests/NativeTests.xcodeproj \
+  -scheme NativeBrazeTests \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.2' \
+  -derivedDataPath DerivedData/native \
+  -resultBundlePath /tmp/braze-native-tests.xcresult CODE_SIGNING_ALLOWED=NO
+```
+
+The native test uses a generated dummy key and a reserved `.invalid`
+endpoint. Expected DNS failures do not establish delivery success.
+Assertions inspect JSON from the SDK's request logger. They can require
+updates if a future SDK changes its diagnostic format.
+
+For live Banner checks, configure the Example for an isolated test source,
+identify an eligible test user, and enter the campaign placement in the
+Banner panel. The panel starts with an empty placement and does not load
+a campaign automatically. Never commit customer credentials.

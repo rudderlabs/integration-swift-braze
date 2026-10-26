@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
-import RudderStackAnalytics
 
 struct ContentView: View {
-    private var analyticsManager = AnalyticsManager.shared
+    @ObservedObject private var analyticsManager = AnalyticsManager.shared
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
+                    if let braze = analyticsManager.braze {
+                        BannerVerificationView(braze: braze)
+                    }
                     // User Identity Section
                     VStack(spacing: 12) {
                         Text("User Identity")

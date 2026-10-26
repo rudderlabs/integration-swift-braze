@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://rudderstack.com/">
-    <img alt="RudderStack" width="512" src="https://raw.githubusercontent.com/rudderlabs/rudder-sdk-js/develop/assets/rs-logo-full-light.jpg">
+    <img alt="RudderStack" width="512" src="https://cdn.rudderlabs.com/brand/logo_watermark_light.png">
   </a>
   <br />
   <caption>The Customer Data Platform for Developers</caption>
@@ -104,8 +104,10 @@ If your app uses another Braze package, for example `braze-swift-sdk`, do one of
 This integration supports Braze iOS SDK version:
 
 ```
-12.0.0+
+>=18.2.0, <19.0.0
 ```
+
+Use Xcode 26 or later. See [Migrating to 2.0.0](MIGRATION.md) before upgrading from 1.x.
 
 ### Platform Support
 
