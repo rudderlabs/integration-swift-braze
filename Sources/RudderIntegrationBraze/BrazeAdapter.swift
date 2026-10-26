@@ -41,7 +41,9 @@ class DefaultBrazeAdapter: BrazeAdapter {
 
     private var braze: Braze?
 
-    init() {}
+    init(braze: Braze? = nil) {
+        self.braze = braze
+    }
 
     func initSDK(appIdentifierKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
         guard braze == nil else { return true }

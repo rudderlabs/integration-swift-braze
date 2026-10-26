@@ -114,6 +114,25 @@ Replace:
 - `<WRITE_KEY>`: Your project's write key from the RudderStack dashboard
 - `<DATA_PLANE_URL>`: The URL of your RudderStack data plane
 
+## Lite mode
+
+In lite mode, your app initialises Braze and passes the instance to the integration. The integration then only maps
+events and sends them to that instance.
+
+1. Initialise Braze with your own configuration, as Braze documents.
+2. Pass the Braze instance to the integration:
+
+```swift
+analytics.add(plugin: BrazeIntegration(braze: braze))
+```
+
+In lite mode, the integration:
+
+- Does not create Braze or set the Braze log level.
+- Sets the `rudder_id` alias and applies the mapping settings from the dashboard, as in the standard mode.
+- Waits for the source config before it sends events. The dashboard settings still need valid values, but lite mode
+  does not use the API key or the endpoint.
+
 ## Recommended ecommerce events
 
 The integration can map supported RudderStack ecommerce `track` events to [Braze recommended ecommerce events](https://www.braze.com/docs/user_guide/data/activation/events/recommended_events) (`ecommerce.*`). This is opt-in via the `useEcommerceRecommendedEvents` destination flag (configured in the RudderStack dashboard) and defaults to **off** — when off, track handling is unchanged.

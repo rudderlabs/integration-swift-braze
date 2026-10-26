@@ -49,6 +49,17 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
     }
 
     /**
+     Creates the integration in lite mode, with a Braze instance that the app has already initialised.
+
+     The integration does not create Braze or set the Braze log level. The dashboard settings still need valid values.
+
+     - Parameter braze: The Braze instance that the app initialised.
+     */
+    public init(braze: Braze) {
+        self.brazeAdapter = DefaultBrazeAdapter(braze: braze)
+    }
+
+    /**
      * Internal initializer for unit testing.
      * Allows dependency injection of a mock BrazeAdapter.
      */
@@ -62,18 +73,20 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      * Creates and initializes the Braze integration
      */
     public func create(destinationConfig: [String: Any]) throws {
-        if let config: RudderBrazeConfig = parse(destinationConfig) {
-            self.brazeConfig = config
-            let success = brazeAdapter.initSDK(
-                appIdentifierKey: config.resolvedAppIdentifierKey,
-                endpoint: config.customEndpoint,
-                logLevel: LoggerAnalytics.logLevel
-            )
-
-            if success {
-                setUserAlias()
-            }
+        guard let config: RudderBrazeConfig = parse(destinationConfig) else {
+            throw BrazeIntegrationError.invalidConfig
         }
+        self.brazeConfig = config
+        let success = brazeAdapter.initSDK(
+            appIdentifierKey: config.resolvedAppIdentifierKey,
+            endpoint: config.customEndpoint,
+            logLevel: LoggerAnalytics.logLevel
+        )
+
+        guard success else {
+            throw BrazeIntegrationError.initializationFailed
+        }
+        setUserAlias()
     }
 
     /**
@@ -229,5 +242,20 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      */
     public func flush() {
         brazeAdapter.requestImmediateDataFlush()
+    }
+}
+
+// MARK: - BrazeIntegrationError
+enum BrazeIntegrationError: LocalizedError {
+    case invalidConfig
+    case initializationFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidConfig:
+            "The destination config is empty or invalid"
+        case .initializationFailed:
+            "The Braze SDK did not initialise"
+        }
     }
 }

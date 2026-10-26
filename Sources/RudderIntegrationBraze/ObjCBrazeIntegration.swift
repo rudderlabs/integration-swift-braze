@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import BrazeKit
 import RudderStackAnalytics
 
 // MARK: - ObjCBrazeIntegration
@@ -56,6 +57,17 @@ public class ObjCBrazeIntegration: NSObject, ObjCIntegrationPlugin, ObjCStandard
     @objc
     public override init() {
         self.brazeIntegration = BrazeIntegration()
+        super.init()
+    }
+
+    /**
+     Initializes the Braze integration in lite mode, with a Braze instance that the app has already initialised.
+
+     - Parameter braze: The Braze instance that the app initialised.
+     */
+    @objc
+    public init(braze: Braze) {
+        self.brazeIntegration = BrazeIntegration(braze: braze)
         super.init()
     }
 
