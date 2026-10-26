@@ -69,6 +69,36 @@ let package = Package(
 )
 ```
 
+### Braze package
+
+The integration depends on the static Braze package, `braze-swift-sdk-prebuilt-static`. If your app also adds Braze itself, for example for lite mode or for `BrazeUI`, it must use the same package. Swift Package Manager cannot build an app that gets Braze from two packages. The build then fails with `multiple similar targets 'BrazeKit' ... appear in package`.
+
+If your app uses another Braze package, for example `braze-swift-sdk`, do one of these:
+
+- Replace it with `https://github.com/braze-inc/braze-swift-sdk-prebuilt-static`. The product names are the same, for example `BrazeKit` and `BrazeUI`.
+- Keep it, and add a Swift Package Manager mirror from your Braze package to the static package:
+  - In a Swift package, run this in the package folder:
+
+    ```bash
+    swift package config set-mirror --original https://github.com/braze-inc/braze-swift-sdk --mirror https://github.com/braze-inc/braze-swift-sdk-prebuilt-static
+    ```
+
+  - In an Xcode project, add the file `YourApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration/mirrors.json` with the content below. Add an empty file `config.lock` in the same folder.
+
+    ```json
+    {
+      "object" : [
+        {
+          "mirror" : "https://github.com/braze-inc/braze-swift-sdk-prebuilt-static",
+          "original" : "https://github.com/braze-inc/braze-swift-sdk"
+        }
+      ],
+      "version" : 1
+    }
+    ```
+
+  Then delete `Package.resolved` and resolve the packages again.
+
 ## Supported Native Braze SDK Version
 
 This integration supports Braze iOS SDK version:
