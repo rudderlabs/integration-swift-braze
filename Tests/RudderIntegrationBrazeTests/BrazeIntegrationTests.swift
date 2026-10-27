@@ -80,13 +80,6 @@ class BrazeIntegrationTests {
         #expect(mockAdapter.addUserAliasCalls.first?.label == "rudder_id")
     }
 
-    @Test("failed initialization does not add an alias")
-    func testFailedInitializationDoesNotAlias() throws {
-        mockAdapter.shouldFailInitialization = true
-        try setupWithDefaultConfig()
-        #expect(mockAdapter.addUserAliasCalls.isEmpty)
-    }
-
     @Test("identify and immediate events preserve invocation order across users")
     func testImmediateIdentifyAndEventOrder() throws {
         try setupWithDefaultConfig()
@@ -590,5 +583,30 @@ class BrazeIntegrationTests {
         #expect(freshAdapter.isInitialized == true)
         #expect(freshAdapter.initSDKCalls.count == 1)
         #expect(freshAdapter.addUserAliasCalls.count == 0) // No alias set without analytics
+    }
+
+    @Test("given an empty or invalid config, when create is called, then it throws, update does not, and a later valid config initialises Braze")
+    func testCreateThrowsOnInvalidConfig() throws {
+        #expect(throws: BrazeIntegrationError.invalidConfig) { try self.brazeIntegration.create(destinationConfig: [:]) }
+        #expect(throws: BrazeIntegrationError.invalidConfig) {
+            try self.brazeIntegration.create(destinationConfig: BrazeTestData.invalidConfig)
+        }
+        try brazeIntegration.update(destinationConfig: [:])
+        #expect(mockAdapter.initSDKCalls.isEmpty)
+
+        try brazeIntegration.create(destinationConfig: BrazeTestData.validConfig)
+
+        #expect(mockAdapter.initSDKCalls.count == 1)
+        #expect(mockAdapter.isInitialized == true)
+    }
+
+    @Test("given the Braze SDK does not initialise, when create is called, then it throws")
+    func testCreateThrowsWhenInitializationFails() {
+        mockAdapter.shouldFailInitialization = true
+
+        #expect(throws: BrazeIntegrationError.initializationFailed) {
+            try self.brazeIntegration.create(destinationConfig: BrazeTestData.validConfig)
+        }
+        #expect(mockAdapter.addUserAliasCalls.isEmpty)
     }
 }

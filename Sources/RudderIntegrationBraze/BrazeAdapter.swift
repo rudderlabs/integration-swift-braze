@@ -42,7 +42,8 @@ class DefaultBrazeAdapter: BrazeAdapter {
     private var braze: Braze?
     private let makeBraze: (Braze.Configuration) -> Braze
 
-    init(makeBraze: @escaping (Braze.Configuration) -> Braze = { Braze(configuration: $0) }) {
+    init(braze: Braze? = nil, makeBraze: @escaping (Braze.Configuration) -> Braze = { Braze(configuration: $0) }) {
+        self.braze = braze
         self.makeBraze = makeBraze
     }
 
