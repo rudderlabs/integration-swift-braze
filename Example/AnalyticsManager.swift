@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import Combine
+import BrazeKit
 import RudderStackAnalytics
 
-class AnalyticsManager {
+class AnalyticsManager: ObservableObject {
     static let shared = AnalyticsManager()
     var analytics: Analytics?
+    @Published var braze: Braze?
 
     private init() {}
 }

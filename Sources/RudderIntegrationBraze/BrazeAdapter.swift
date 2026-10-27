@@ -40,9 +40,11 @@ enum BrazeUserAttribute {
 class DefaultBrazeAdapter: BrazeAdapter {
 
     private var braze: Braze?
+    private let makeBraze: (Braze.Configuration) -> Braze
 
-    init(braze: Braze? = nil) {
+    init(braze: Braze? = nil, makeBraze: @escaping (Braze.Configuration) -> Braze = { Braze(configuration: $0) }) {
         self.braze = braze
+        self.makeBraze = makeBraze
     }
 
     func initSDK(appIdentifierKey: String, endpoint: String, logLevel: LogLevel) -> Bool {
@@ -51,7 +53,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
         let configuration = Braze.Configuration(apiKey: appIdentifierKey, endpoint: endpoint)
         setLogLevel(rudderLogLevel: logLevel, brazeConfiguration: configuration)
 
-        let braze = Braze(configuration: configuration)
+        let braze = makeBraze(configuration)
         self.braze = braze
         LoggerAnalytics.verbose("BrazeAdapter: Braze SDK initialized")
         return true
