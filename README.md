@@ -71,7 +71,7 @@ let package = Package(
 
 ### Braze package
 
-The integration depends on the static Braze package, `braze-swift-sdk-prebuilt-static`. If your app also adds Braze itself, for example for lite mode or for `BrazeUI`, it must use the same package. Swift Package Manager cannot build an app that gets Braze from two packages. The build then fails with `multiple similar targets 'BrazeKit' ... appear in package`.
+The integration depends on the static Braze package, `braze-swift-sdk-prebuilt-static`. If your app also adds Braze itself, for example to [use your own Braze instance](#use-your-own-braze-instance) or for `BrazeUI`, it must use the same package. Swift Package Manager cannot build an app that gets Braze from two packages. The build then fails with `multiple similar targets 'BrazeKit' ... appear in package`.
 
 If your app uses another Braze package, for example `braze-swift-sdk`, do one of these:
 
@@ -146,24 +146,37 @@ Replace:
 - `<WRITE_KEY>`: Your project's write key from the RudderStack dashboard
 - `<DATA_PLANE_URL>`: The URL of your RudderStack data plane
 
-## Lite mode
+## Use your own Braze instance
 
-In lite mode, your app initialises Braze and passes the instance to the integration. The integration then only maps
-events and sends them to that instance.
+In the default setup, the integration initializes Braze from the destination configuration. Instead, your app can
+initialize Braze and pass that instance to the integration. The integration then only maps events and sends them to
+your instance. This needs integration version 3.0.0 or higher.
 
-1. Initialise Braze with your own configuration, as Braze documents.
-2. Pass the Braze instance to the integration:
+1. Add the Braze Swift SDK to your app target. Use the package `https://github.com/braze-inc/braze-swift-sdk-prebuilt-static`,
+   the product `BrazeKit`, and a version in the range `[18.2.0, 19.0.0)`. See [Braze package](#braze-package).
+2. Initialize Braze with your own configuration, as [Braze documents](https://www.braze.com/docs/developer_guide/sdk_integration?sdktab=swift).
+3. Pass the Braze instance to the integration:
 
 ```swift
+import BrazeKit
+import RudderStackAnalytics
+import RudderIntegrationBraze
+
+let configuration = Braze.Configuration(apiKey: "<BRAZE_API_KEY>", endpoint: "<BRAZE_ENDPOINT>")
+let braze = Braze(configuration: configuration)
+
 analytics.add(plugin: BrazeIntegration(braze: braze))
 ```
 
-In lite mode, the integration:
+With your own instance, the integration:
 
-- Does not create Braze or set the Braze log level.
-- Sets the `rudder_id` alias and applies the mapping settings from the dashboard, as in the standard mode.
-- Waits for the source config before it sends events. The dashboard settings still need valid values, but lite mode
-  does not use the API key or the endpoint.
+- Doesn't initialize Braze or set the Braze log level.
+- Still sets the `rudder_id` alias and applies the mapping settings in the destination configuration.
+- Waits for the source configuration before it sends events.
+
+The integration still checks the connection settings. Set the **Data Center** and an App Identifier key, as in the
+default setup: the default key, or the iOS key when platform-specific keys are on. The integration doesn't use them
+to initialize Braze.
 
 ## Recommended ecommerce events
 
