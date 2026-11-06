@@ -1,0 +1,111 @@
+{
+  "copiedFiles": [
+    {
+      "output": "Sources/RudderIntegrationBraze/BrazeAdapter.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/BrazeAdapter.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "Sources/RudderIntegrationBraze/BrazeIntegration.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/BrazeIntegration.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "Sources/RudderIntegrationBraze/EcommerceUtil.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/EcommerceUtil.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "Sources/RudderIntegrationBraze/ObjCBrazeIntegration.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/ObjCBrazeIntegration.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "Sources/RudderIntegrationBraze/RudderBrazeConfig.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/RudderBrazeConfig.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "Sources/RudderIntegrationBraze/Utils.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/Utils.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "Sources/RudderIntegrationBraze/Version.swift",
+      "source": "Integrations/Braze/Sources/RudderIntegrationBraze/Version.swift",
+      "transform": "copy"
+    },
+    {
+      "output": "CHANGELOG.md",
+      "source": "Integrations/Braze/CHANGELOG.md",
+      "transform": "copy"
+    },
+    {
+      "output": "LICENSE",
+      "source": "LICENSE",
+      "transform": "copy"
+    },
+    {
+      "output": "README.md",
+      "source": "Integrations/Braze/README.md",
+      "transform": "generated"
+    },
+    {
+      "output": ".github/CODEOWNERS",
+      "source": null,
+      "transform": "generated"
+    },
+    {
+      "output": ".gitignore",
+      "source": null,
+      "transform": "generated"
+    },
+    {
+      "output": "CONTRIBUTING.md",
+      "source": null,
+      "transform": "generated"
+    },
+    {
+      "output": "Package.swift",
+      "source": null,
+      "transform": "generated"
+    },
+    {
+      "output": "VERSION",
+      "source": null,
+      "transform": "generated"
+    }
+  ],
+  "fileHashes": {
+    ".github/CODEOWNERS": "b6186d483919a45be6dd29537a58adc1a5a34338ab74fcf6e9985506c18eb025",
+    ".gitignore": "6c3f21e0d020c2a3887f176d7d69e0e6456e31888e053bf9dd5d1c5c78972aeb",
+    "CHANGELOG.md": "fe35f0f634d347ab69c764ba29054009079ce5c72f982648918a314c5b73814b",
+    "CONTRIBUTING.md": "096fcd19aaf830e79dfbca85c1ddd1cd8a6b68e191fa7ce93118c6948086325b",
+    "LICENSE": "130c075edb106634e90df2eb62cba8f7a3cb2c0e8ccec39cb168fc649684205d",
+    "Package.swift": "1e8f795d8c06d2093d069f1809c0599b564cc0d4c86d0b6c0acd3231e1756e69",
+    "README.md": "b1e2277f58a01e44a4535b56d0f90f944280471853263c3aa30e6940039e7859",
+    "Sources/RudderIntegrationBraze/BrazeAdapter.swift": "8bdd20b01821bd72a173feb9bf070200beddd904c148ccbb7321c7929acb8941",
+    "Sources/RudderIntegrationBraze/BrazeIntegration.swift": "d565101f9e4b532a689b5c97534ba51e93bdd74e2a3418c9a2d034f5cedcf63c",
+    "Sources/RudderIntegrationBraze/EcommerceUtil.swift": "bcd42b94c4c05905987e6fe50c6e21e7c544736959d36265f84bb5836b2d4d0f",
+    "Sources/RudderIntegrationBraze/ObjCBrazeIntegration.swift": "46491ad47fb452aff381df9838eaec4a57e266cfdd785f52f7322a3ef6230401",
+    "Sources/RudderIntegrationBraze/RudderBrazeConfig.swift": "cdf1e0381f027b8cf298674f75496093bab327f8c5cb644be1225c82a58a1bb7",
+    "Sources/RudderIntegrationBraze/Utils.swift": "24880e79825ffd2bd858ad5bca05640a80b21b0afd0fd2e05bb6102b9a773ff1",
+    "Sources/RudderIntegrationBraze/Version.swift": "c41651fbd82d27dd80d5b51079d1345031214022eff1cf9cd5ddcda8a06f783a",
+    "VERSION": "2985be8b28d3ade858e8d8fb4bc22f565b1bf6020dff982dce141f7721b9999c"
+  },
+  "package": "braze",
+  "policies": {
+    "RudderStackAnalytics": {
+      "mode": "external",
+      "package": "swift-sdk"
+    }
+  },
+  "schemaVersion": 1,
+  "sourceCommit": "24ca22411b95dcd2cfff92c15e6a5189c0e48b74",
+  "sourceRepository": "rudderlabs/rudder-monorepo-swift",
+  "targetClosure": [
+    "RudderStackAnalytics",
+    "RudderIntegrationBraze"
+  ],
+  "version": "3.0.0"
+}
