@@ -313,9 +313,9 @@ private func matchesType(_ value: Any, _ type: BrazeFieldType) -> Bool {
         if value is Bool { return false }
         return value is Int || value is Double
     case .stringArray:
-        return value as? [String] != nil
+        return value is [String]
     case .array:
-        return value as? [Any] != nil
+        return value is [Any]
     }
 }
 

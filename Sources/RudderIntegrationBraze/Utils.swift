@@ -214,17 +214,17 @@ func getDeDupedCustomTraits(
  */
 private func areValuesEqual(_ value1: Any, _ value2: Any) -> Bool {
     // Handle common types
-    if let v1 = value1 as? String, let v2 = value2 as? String {
-        return v1 == v2
+    if let lhs = value1 as? String, let rhs = value2 as? String {
+        return lhs == rhs
     }
-    if let v1 = value1 as? NSNumber, let v2 = value2 as? NSNumber {
-        return v1 == v2
+    if let lhs = value1 as? NSNumber, let rhs = value2 as? NSNumber {
+        return lhs == rhs
     }
-    if let v1 = value1 as? Bool, let v2 = value2 as? Bool {
-        return v1 == v2
+    if let lhs = value1 as? Bool, let rhs = value2 as? Bool {
+        return lhs == rhs
     }
-    if let v1 = value1 as? Date, let v2 = value2 as? Date {
-        return v1 == v2
+    if let lhs = value1 as? Date, let rhs = value2 as? Date {
+        return lhs == rhs
     }
 
     // Fallback to NSObject comparison

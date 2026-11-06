@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/rudderlabs/rudder-monorepo-swift/compare/integration-braze-3.0.0...integration-braze-3.0.1) (2026-11-06)
+
+
+### Code Refactoring
+
+* **braze:** resolve SwiftLint findings ([#43](https://github.com/rudderlabs/rudder-monorepo-swift/issues/43)) ([81cfd7e](https://github.com/rudderlabs/rudder-monorepo-swift/commit/81cfd7e72b5e2f13084d371cadbaec8cc7865eb5))
+
 ## 3.0.0 - 2026-10-27
 
 ### Breaking changes
