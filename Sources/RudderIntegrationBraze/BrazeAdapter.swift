@@ -157,17 +157,17 @@ class DefaultBrazeAdapter: BrazeAdapter {
         }
 
         switch value {
-            case let boolValue as Bool:
-                braze.user.setCustomAttribute(key: key, value: boolValue)
-            case let intValue as Int:
-                braze.user.setCustomAttribute(key: key, value: intValue)
-            case let doubleValue as Double:
-                braze.user.setCustomAttribute(key: key, value: doubleValue)
-            case let stringValue as String:
-                handleStringValue(braze: braze, key: key, value: stringValue)
-            case let dateValue as Date:
-                braze.user.setCustomAttribute(key: key, value: dateValue)
-            default:
+        case let boolValue as Bool:
+            braze.user.setCustomAttribute(key: key, value: boolValue)
+        case let intValue as Int:
+            braze.user.setCustomAttribute(key: key, value: intValue)
+        case let doubleValue as Double:
+            braze.user.setCustomAttribute(key: key, value: doubleValue)
+        case let stringValue as String:
+            handleStringValue(braze: braze, key: key, value: stringValue)
+        case let dateValue as Date:
+            braze.user.setCustomAttribute(key: key, value: dateValue)
+        default:
                 logUnsupportedType(key: key, value: value)
         }
     }
@@ -192,24 +192,24 @@ class DefaultBrazeAdapter: BrazeAdapter {
         }
         
         switch attribute {
-            case .firstName(let firstName):
-                braze.user.set(firstName: firstName)
-            case .lastName(let lastName):
-                braze.user.set(lastName: lastName)
-            case .email(let email):
-                braze.user.set(email: email)
-            case .dateOfBirth(let dateOfBirth):
-                braze.user.set(dateOfBirth: dateOfBirth)
-            case .gender(let gender):
-                braze.user.set(gender: gender)
-            case .phoneNumber(let phoneNumber):
-                braze.user.set(phoneNumber: phoneNumber)
-            case .homeCity(let homeCity):
-                braze.user.set(homeCity: homeCity)
-            case .country(let country):
-                braze.user.set(country: country)
-            case .attributionData(let attributionData):
-                braze.user.set(attributionData: attributionData)
+        case .firstName(let firstName):
+            braze.user.set(firstName: firstName)
+        case .lastName(let lastName):
+            braze.user.set(lastName: lastName)
+        case .email(let email):
+            braze.user.set(email: email)
+        case .dateOfBirth(let dateOfBirth):
+            braze.user.set(dateOfBirth: dateOfBirth)
+        case .gender(let gender):
+            braze.user.set(gender: gender)
+        case .phoneNumber(let phoneNumber):
+            braze.user.set(phoneNumber: phoneNumber)
+        case .homeCity(let homeCity):
+            braze.user.set(homeCity: homeCity)
+        case .country(let country):
+            braze.user.set(country: country)
+        case .attributionData(let attributionData):
+            braze.user.set(attributionData: attributionData)
         }
     }
 

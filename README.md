@@ -107,7 +107,7 @@ This integration supports Braze iOS SDK version:
 >=18.2.0, <19.0.0
 ```
 
-Use Xcode 26 or later. See [Migrating to 2.0.0](MIGRATION.md) before upgrading from 1.x.
+Use Xcode 26 or later. See [Migrating to 2.0.0](https://github.com/rudderlabs/integration-swift-braze/blob/3.0.0/MIGRATION.md) before upgrading from 1.x.
 
 ### Platform Support
 
