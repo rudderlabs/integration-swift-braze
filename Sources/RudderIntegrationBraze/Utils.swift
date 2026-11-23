@@ -14,9 +14,9 @@ import RudderStackAnalytics
  * This function sanitizes the dictionary to handle non-JSON-serializable types (Date, URL, NSURL, NSNull)
  * before serialization to ensure compatibility with JSONSerialization.
  */
-func parse<T: Decodable>(_ dictionary: [String: Any]) -> T? {
+func parse<T: Decodable>(_ dictionary: [String: Any], logger: Logger) -> T? {
     guard !dictionary.isEmpty else {
-        LoggerAnalytics.debug("BrazeIntegration: The configuration is empty.")
+        logger.debug(log: "BrazeIntegration: The configuration is empty.")
         return nil
     }
 
@@ -27,7 +27,7 @@ func parse<T: Decodable>(_ dictionary: [String: Any]) -> T? {
         decoder.keyDecodingStrategy = .useDefaultKeys
         return try decoder.decode(T.self, from: jsonData)
     } catch {
-        LoggerAnalytics.error("BrazeIntegration: Failed to parse configuration: \(error)")
+        logger.error(log: "BrazeIntegration: Failed to parse configuration: \(error)", error: nil)
         return nil
     }
 }
@@ -37,8 +37,8 @@ func parse<T: Decodable>(_ dictionary: [String: Any]) -> T? {
  *
  * - Returns: StandardProperties object parsed from the dictionary.
  */
-func getStandardProperties(_ properties: [String: Any]) -> StandardProperties {
-    return parse(properties) ?? StandardProperties()
+func getStandardProperties(_ properties: [String: Any], logger: Logger) -> StandardProperties {
+    return parse(properties, logger: logger) ?? StandardProperties()
 }
 
 /**
@@ -115,13 +115,13 @@ func getExternalIdOrUserId(from traits: IdentifyTraits) -> String? {
  * - Parameter event: The IdentifyEvent to convert
  * - Returns: The IdentifyTraits object parsed from the IdentifyEvent.
  */
-func toIdentifyTraits(from event: IdentifyEvent) -> IdentifyTraits {
+func toIdentifyTraits(from event: IdentifyEvent, logger: Logger) -> IdentifyTraits {
     var context = Context()
     let contextDict = event.context?.rawDictionary ?? [:]
 
     // Parse full context from event (not just traits) to capture externalId
     if !contextDict.isEmpty {
-        context = parse(contextDict) ?? Context()
+        context = parse(contextDict, logger: logger) ?? Context()
     }
 
     // Get custom traits by filtering out standard trait keys

@@ -517,7 +517,7 @@ func getEcommerceMapping(_ eventName: String) -> EcommerceEventMapping? {
  *
  * Never throws on data shape; the warnings + the (still-sent) payload are the contract.
  */
-func buildEcommerceEventProperties(properties: [String: Any], brazeEvent: String, action: String?) -> [String: Any] {
+func buildEcommerceEventProperties(properties: [String: Any], brazeEvent: String, action: String?, logger: Logger) -> [String: Any] {
     let mapping = perEventMapping[brazeEvent] ?? []
     let hasProducts = brazeEvent != BrazeEcommerceEvent.productViewed
 
@@ -550,13 +550,13 @@ func buildEcommerceEventProperties(properties: [String: Any], brazeEvent: String
     // Step 5: single warning for any missing Braze-required field.
     let missingFields = collectMissingRequiredFields(mapping: mapping, hasProducts: hasProducts, payload: payload)
     if !missingFields.isEmpty {
-        LoggerAnalytics.warn("BrazeIntegration: \(brazeEvent): missing recommended Braze-required field(s): \(missingFields.joined(separator: ", ")). Event sent anyway.")
+        logger.warn(log: "BrazeIntegration: \(brazeEvent): missing recommended Braze-required field(s): \(missingFields.joined(separator: ", ")). Event sent anyway.")
     }
 
     // Step 6: single warning for any field whose type still doesn't match Braze's schema.
     let mismatchedFields = collectTypeMismatchedFields(mapping: mapping, hasProducts: hasProducts, payload: payload)
     if !mismatchedFields.isEmpty {
-        LoggerAnalytics.warn("BrazeIntegration: \(brazeEvent): type-mismatched field(s) (sent as-is): \(mismatchedFields.joined(separator: ", ")).")
+        logger.warn(log: "BrazeIntegration: \(brazeEvent): type-mismatched field(s) (sent as-is): \(mismatchedFields.joined(separator: ", ")).")
     }
 
     return scrub(payload)

@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.0](https://github.com/rudderlabs/rudder-monorepo-swift/compare/integration-braze-3.0.1...integration-braze-4.0.0) (2026-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **braze:** require braze-swift-sdk-prebuilt-static 19 ([#79](https://github.com/rudderlabs/rudder-monorepo-swift/issues/79))
+
+### Features
+
+* **braze:** require braze-swift-sdk-prebuilt-static 19 ([#79](https://github.com/rudderlabs/rudder-monorepo-swift/issues/79)) ([595fb14](https://github.com/rudderlabs/rudder-monorepo-swift/commit/595fb14c4d70bd4a9b0c516813a7d072b371f012))
+* log integrations through the instance logger ([#74](https://github.com/rudderlabs/rudder-monorepo-swift/issues/74)) ([d00be0c](https://github.com/rudderlabs/rudder-monorepo-swift/commit/d00be0c2e42dcd4677a0f9285ac14e4e137ddef3))
+
 ## [3.0.1](https://github.com/rudderlabs/rudder-monorepo-swift/compare/integration-braze-3.0.0...integration-braze-3.0.1) (2026-11-06)
 
 

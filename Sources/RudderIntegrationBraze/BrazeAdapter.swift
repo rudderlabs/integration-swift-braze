@@ -10,7 +10,8 @@ import BrazeKit
 
 import RudderStackAnalytics
 
-protocol BrazeAdapter {
+protocol BrazeAdapter: AnyObject {
+    var logger: Logger? { get set }
     func initSDK(appIdentifierKey: String, endpoint: String, logLevel: LogLevel) -> Bool
     func addUserAlias(_ alias: String, label: String)
     func changeUser(userId: String)
@@ -39,6 +40,7 @@ enum BrazeUserAttribute {
 
 class DefaultBrazeAdapter: BrazeAdapter {
 
+    var logger: Logger?
     private var braze: Braze?
     private let makeBraze: (Braze.Configuration) -> Braze
 
@@ -55,7 +57,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
 
         let braze = makeBraze(configuration)
         self.braze = braze
-        LoggerAnalytics.verbose("BrazeAdapter: Braze SDK initialized")
+        logger?.verbose(log: "BrazeAdapter: Braze SDK initialized")
         return true
     }
 
@@ -80,16 +82,16 @@ class DefaultBrazeAdapter: BrazeAdapter {
 
     func addUserAlias(_ alias: String, label: String) {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot add user alias.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot add user alias.", error: nil)
             return
         }
         braze.user.add(alias: alias, label: label)
-        LoggerAnalytics.verbose("BrazeAdapter: Added user alias '\(alias)' with label '\(label)'")
+        logger?.verbose(log: "BrazeAdapter: Added user alias '\(alias)' with label '\(label)'")
     }
 
     func changeUser(userId: String) {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot change user.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot change user.", error: nil)
             return
         }
         braze.changeUser(userId: userId)
@@ -121,7 +123,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
         }
 
         setCustomTraits(customTraits: deDupedTraits.customTraits)
-        LoggerAnalytics.verbose("BrazeAdapter: Set user traits")
+        logger?.verbose(log: "BrazeAdapter: Set user traits")
     }
 
     private func setGender(gender: String) {
@@ -131,7 +133,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
         case "F", "FEMALE":
             setUserAttribute(.gender(.female))
         default:
-            LoggerAnalytics.error("BrazeAdapter: Unsupported gender: \(gender)")
+            logger?.error(log: "BrazeAdapter: Unsupported gender: \(gender)", error: nil)
         }
     }
 
@@ -152,7 +154,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
 
     private func setCustomAttribute(key: String, value: Any) {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot set custom attribute.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot set custom attribute.", error: nil)
             return
         }
 
@@ -182,12 +184,12 @@ class DefaultBrazeAdapter: BrazeAdapter {
     }
 
     private func logUnsupportedType(key: String, value: Any) {
-        LoggerAnalytics.debug("BrazeAdapter: Unsupported type for key '\(key)': \(type(of: value))")
+        logger?.debug(log: "BrazeAdapter: Unsupported type for key '\(key)': \(type(of: value))")
     }
 
     func setUserAttribute(_ attribute: BrazeUserAttribute) {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot set user attribute.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot set user attribute.", error: nil)
             return
         }
         
@@ -215,7 +217,7 @@ class DefaultBrazeAdapter: BrazeAdapter {
 
     func logPurchase(productId: String, currency: String, price: Double, quantity: Int, properties: [String: Any]?) {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot log purchase.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot log purchase.", error: nil)
             return
         }
         braze.logPurchase(
@@ -225,31 +227,31 @@ class DefaultBrazeAdapter: BrazeAdapter {
             quantity: quantity,
             properties: properties
         )
-        LoggerAnalytics.verbose("BrazeAdapter: Logged purchase for product '\(productId)', currency: \(currency), price: \(price), quantity: \(quantity)")
+        logger?.verbose(log: "BrazeAdapter: Logged purchase for product '\(productId)', currency: \(currency), price: \(price), quantity: \(quantity)")
     }
 
     func logCustomEvent(name: String, properties: [String: Any]?) {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot log custom event.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot log custom event.", error: nil)
             return
         }
 
         if let properties = properties, !properties.isEmpty {
             braze.logCustomEvent(name: name, properties: properties)
-            LoggerAnalytics.verbose("BrazeAdapter: Logged custom event '\(name)' with properties \(properties)")
+            logger?.verbose(log: "BrazeAdapter: Logged custom event '\(name)' with properties \(properties)")
         } else {
             braze.logCustomEvent(name: name)
-            LoggerAnalytics.verbose("BrazeAdapter: Logged custom event '\(name)'")
+            logger?.verbose(log: "BrazeAdapter: Logged custom event '\(name)'")
         }
     }
 
     func requestImmediateDataFlush() {
         guard let braze else {
-            LoggerAnalytics.error("BrazeAdapter: Braze SDK not initialized. Cannot flush data.")
+            logger?.error(log: "BrazeAdapter: Braze SDK not initialized. Cannot flush data.", error: nil)
             return
         }
         braze.requestImmediateDataFlush()
-        LoggerAnalytics.verbose("BrazeAdapter: Data flush completed")
+        logger?.verbose(log: "BrazeAdapter: Data flush completed")
     }
 
     func getDestinationInstance() -> Any? {
