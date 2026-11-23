@@ -52,12 +52,12 @@ struct RudderBrazeConfig: Codable {
      * Prefers iOSAppIdentifierKey when usePlatformSpecificAppIdentifierKeys is enabled and iOSAppIdentifierKey is not blank.
      * Falls back to the default appIdentifierKey otherwise.
      */
-    var resolvedAppIdentifierKey: String {
+    func resolvedAppIdentifierKey(logger: Logger?) -> String {
         if usePlatformSpecificAppIdentifierKeys {
             if let iosKey = iOSAppIdentifierKey, !iosKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return iosKey
             } else {
-                LoggerAnalytics.error("BrazeIntegration: Configured to use platform-specific App Identifier Keys but iOS App Identifier Key is not valid. Falling back to the Default App Identifier Key.")
+                logger?.error(log: "BrazeIntegration: Configured to use platform-specific App Identifier Keys but iOS App Identifier Key is not valid. Falling back to the Default App Identifier Key.", error: nil)
                 return appIdentifierKey
             }
         } else {
@@ -80,7 +80,7 @@ struct RudderBrazeConfig: Codable {
         customEndpoint = try CustomEndpointDecoder.decode(dataCenterString)
 
         // Validation
-        guard !resolvedAppIdentifierKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !resolvedAppIdentifierKey(logger: nil).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw DecodingError.dataCorruptedError(
                 forKey: .appIdentifierKey,
                 in: container,
@@ -97,10 +97,10 @@ struct RudderBrazeConfig: Codable {
         }
     }
 
-    func isHybridMode() -> Bool {
+    func isHybridMode(logger: Logger) -> Bool {
         switch connectionMode {
         case .hybrid:
-            LoggerAnalytics.verbose("BrazeIntegration: As connection mode is set to hybrid, dropping event request.")
+            logger.verbose(log: "BrazeIntegration: As connection mode is set to hybrid, dropping event request.")
             return true
         case .device:
             return false

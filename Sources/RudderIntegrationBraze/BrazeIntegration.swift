@@ -73,14 +73,15 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      * Creates and initializes the Braze integration
      */
     public func create(destinationConfig: [String: Any]) throws {
-        guard let config: RudderBrazeConfig = parse(destinationConfig) else {
+        brazeAdapter.logger = logger
+        guard let config: RudderBrazeConfig = parse(destinationConfig, logger: logger) else {
             throw BrazeIntegrationError.invalidConfig
         }
         self.brazeConfig = config
         let success = brazeAdapter.initSDK(
-            appIdentifierKey: config.resolvedAppIdentifierKey,
+            appIdentifierKey: config.resolvedAppIdentifierKey(logger: logger),
             endpoint: config.customEndpoint,
-            logLevel: LoggerAnalytics.logLevel
+            logLevel: analytics?.configuration.logLevel ?? LogLevel.none
         )
 
         guard success else {
@@ -103,9 +104,9 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      * Updates destination configuration dynamically
      */
     public func update(destinationConfig: [String: Any]) throws {
-        if let updatedConfig: RudderBrazeConfig = parse(destinationConfig) {
+        if let updatedConfig: RudderBrazeConfig = parse(destinationConfig, logger: logger) {
             self.brazeConfig = updatedConfig
-            LoggerAnalytics.debug("Braze configuration updated")
+            logger.debug(log: "Braze configuration updated")
         }
     }
 
@@ -121,7 +122,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      * Handles track events
      */
     public func track(payload: TrackEvent) {
-        if brazeConfig?.isHybridMode() == true { return }
+        if brazeConfig?.isHybridMode(logger: logger) == true { return }
 
         // Recommended ecommerce events take precedence over the legacy path when opted in.
         // For mapped events (incl. Order Completed → ecommerce.order_placed) this returns
@@ -154,7 +155,8 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
         let eventProperties = buildEcommerceEventProperties(
             properties: properties,
             brazeEvent: mapping.brazeEvent,
-            action: mapping.action
+            action: mapping.action,
+            logger: logger
         )
         brazeAdapter.logCustomEvent(name: mapping.brazeEvent, properties: eventProperties)
     }
@@ -165,7 +167,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
     private func handleInstallAttributedEvent(payload: TrackEvent) {
         let properties = payload.properties?.dictionary?.rawDictionary ?? [:]
 
-        if let installAttributed: InstallAttributed = parse(properties),
+        if let installAttributed: InstallAttributed = parse(properties, logger: logger),
            let campaign = installAttributed.campaign {
             brazeAdapter.setUserAttribute(.attributionData(Braze.User.AttributionData(
                 network: campaign.source,
@@ -191,7 +193,7 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
             productKeys: Product.getKeysAsList()
         )
 
-        let standardProperties = getStandardProperties(properties)
+        let standardProperties = getStandardProperties(properties, logger: logger)
         let currency = standardProperties.currency
 
         for product in standardProperties.products where product.isNotEmpty() {
@@ -217,9 +219,9 @@ public class BrazeIntegration: IntegrationPlugin, StandardIntegration {
      * Handles identify events
      */
     public func identify(payload: IdentifyEvent) {
-        if brazeConfig?.isHybridMode() == true { return }
+        if brazeConfig?.isHybridMode(logger: logger) == true { return }
 
-        let currentIdentifyTraits = toIdentifyTraits(from: payload)
+        let currentIdentifyTraits = toIdentifyTraits(from: payload, logger: logger)
 
         let deDupedTraits: IdentifyTraits
         if brazeConfig?.supportDedup == true {
